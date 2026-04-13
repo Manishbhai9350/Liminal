@@ -1,7 +1,7 @@
 import gsap from 'gsap'
 import UI from './components/ui'
-import Scene from './scene/scene'
 import { SplitText } from 'gsap/SplitText'
+import Experience from './scene/components/Experience'
 
 
 gsap.registerPlugin(SplitText)
@@ -9,7 +9,7 @@ const App = () => {
   return (
     <main className='app'>
       <UI />
-      <Scene />
+    <Experience/>
     </main>
   )
 }
