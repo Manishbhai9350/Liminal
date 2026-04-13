@@ -1,11 +1,13 @@
-import React from 'react'
+import { DATA } from "../config/data";
+import Content from "./content";
 
 const UI = () => {
   return (
-    <div className='ui'>
-        <h1 className='inter'>Precision lives in <br /> the cold</h1>
+    <div className="ui">
+      {/* <Content {...DATA.sceneA} /> */}
+      <Content {...DATA.sceneB} />
     </div>
-  )
-}
+  );
+};
 
-export default UI
+export default UI;

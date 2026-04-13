@@ -1,0 +1,30 @@
+<svg viewBox="0 0 100 103" xmlns="http://www.w3.org/2000/svg" style="width:200px;height:200px;display:block;margin:2rem auto;border-radius:22px;background:#050810">
+  <defs>
+    <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4466ff"/>
+      <stop offset="100%" stop-color="#0022cc"/>
+    </linearGradient>
+    <linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff2200"/>
+      <stop offset="100%" stop-color="#880000"/>
+    </linearGradient>
+    <clipPath id="left">
+      <rect x="0" y="0" width="50" height="100"/>
+    </clipPath>
+    <clipPath id="right">
+      <rect x="50" y="0" width="50" height="100"/>
+    </clipPath>
+  <mask id="imagine-text-gaps-5p4b64" maskUnits="userSpaceOnUse"><rect x="0" y="0" width="100" height="103" fill="white"/><rect x="21.32291603088379" y="4.0799970626831055" width="57.36275100708008" height="85.71334075927734" fill="black" rx="2"/><rect x="21.32291603088379" y="4.0799970626831055" width="57.36275100708008" height="85.71334075927734" fill="black" rx="2"/><rect x="21.06541633605957" y="82.13333129882812" width="57.86916732788086" height="12.583333015441895" fill="black" rx="2"/></mask></defs>
+
+  <!-- L blue half -->
+  <text x="50" y="72" font-family="Georgia,serif" font-size="72" font-weight="700" text-anchor="middle" fill="url(#lg1)" clip-path="url(#left)" style="stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:72px;font-weight:700;text-anchor:middle;dominant-baseline:auto">L</text>
+
+  <!-- L red half -->
+  <text x="50" y="72" font-family="Georgia,serif" font-size="72" font-weight="700" text-anchor="middle" fill="url(#lg2)" clip-path="url(#right)" style="stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Georgia, serif;font-size:72px;font-weight:700;text-anchor:middle;dominant-baseline:auto">L</text>
+
+  <!-- split line -->
+  <line x1="50" y1="14" x2="50" y2="82" stroke="rgba(255,255,255,0.15)" stroke-width="0.8" mask="url(#imagine-text-gaps-5p4b64)" style="fill:rgb(0, 0, 0);stroke:rgba(255, 255, 255, 0.15);color:rgb(251, 251, 254);stroke-width:0.8px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- bottom label -->
+  <text x="50" y="91" font-family="monospace" font-size="7.5" font-weight="400" text-anchor="middle" fill="rgba(255,255,255,0.25)" letter-spacing="3" style="fill:rgba(255, 255, 255, 0.25);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:monospace;font-size:7.5px;font-weight:400;text-anchor:middle;dominant-baseline:auto">LIMINAL</text>
+</svg>
