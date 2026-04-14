@@ -9,6 +9,9 @@ gsap.registerPlugin(SplitText);
 const App = () => {
   return (
     <>
+    <div className="bg">
+      
+    </div>
       <ReactLenis root />
       <main className="app">
         <UI />

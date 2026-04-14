@@ -9,9 +9,19 @@
 html,
 body {
   width: 100%;
-  height: 100vh!important;
+  height: 100vh !important;
   color: white;
   /* overflow: hidden; */
+}
+
+.bg {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 997;
+  background: url("/Design/bg.jpeg") center center / cover no-repeat;
 }
 
 .poppins {
@@ -32,15 +42,13 @@ main.app {
   height: 1000vh;
   position: relative;
   /* overflow: hidden; */
-  background: linear-gradient(to bottom, red , blue);
 }
-
 
 .canvas {
   width: 100vw;
   height: 100vh;
   position: fixed;
-  z-index: 9999;
+  z-index: 998;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -55,7 +63,6 @@ main.app {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: url("/Design/bg.jpeg") center center / cover no-repeat;
 
   .content {
     position: absolute;
@@ -131,7 +138,7 @@ main.app {
         border-radius: 1.2px;
         background: rgba(255, 255, 255, 0.537);
         &::before {
-          content:'';
+          content: "";
           width: 3px;
           height: 100%;
           background: rgba(255, 255, 255, 0.48);
@@ -143,7 +150,7 @@ main.app {
           /* transform: translateX(100%); */
         }
         &::after {
-          content:'';
+          content: "";
           width: 3px;
           height: 100%;
           background: rgba(255, 255, 255, 0.48);
