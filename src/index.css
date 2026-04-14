@@ -13,6 +13,16 @@ body {
   height: 100vh !important;
 }
 
+.bg {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 997;
+  background: url("/Design/bg.jpeg") center center / cover no-repeat;
+}
+
 .poppins {
   font-family: "Poppins", sans-serif;
   font-optical-sizing: auto;

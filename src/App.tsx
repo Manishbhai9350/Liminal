@@ -1,6 +1,3 @@
-import "lenis/dist/lenis.css";
-
-import { ReactLenis, useLenis } from "lenis/react";
 import gsap from "gsap";
 import UI from "./components/ui";
 import Experience from "./scene/components/Experience";
@@ -12,10 +9,9 @@ const App = () => {
   return (
     <ScrollProvider paused={true} max={innerHeight * 10}>
       <div className="bg"></div>
-      <ReactLenis />
       <main className="app">
         <UI />
-        {/* <Experience /> */}
+        <Experience />
       </main>
     </ScrollProvider>
   );
