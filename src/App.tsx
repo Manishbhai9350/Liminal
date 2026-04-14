@@ -14,7 +14,7 @@ const App = () => {
       <ReactLenis root />
       <main className="app">
         <UI />
-        {/* <Experience /> */}
+        <Experience />
       </main>
     </>
   );
