@@ -1,16 +1,23 @@
-import { useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import type { DataType } from "../config/data";
 import { useGSAP } from "@gsap/react";
-import { setDomOverflow, SplitIt } from "../utils";
+import { SplitIt } from "../utils";
 import gsap from "gsap";
-import { useLenis } from "lenis/react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import { SCENE_CONFIG } from "../config/scene.config";
+import { useScroll } from "./scroll/useScroll";
 
 interface ContentProps extends DataType {
   scene: "sceneA" | "sceneB";
+  setLoaded: Dispatch<SetStateAction<boolean>>;
+  loaded: boolean;
 }
+
 const Content = ({
   heading,
   heading2,
@@ -18,6 +25,8 @@ const Content = ({
   scrollCue,
   sys,
   scene,
+  loaded,
+  setLoaded,
 }: ContentProps) => {
   const ContentRef = useRef(null);
   const HeadingRef = useRef(null);
@@ -29,46 +38,74 @@ const Content = ({
   const ProgressStatusRef = useRef(null);
   const ProgressBarParentRef = useRef(null);
   const ProgressRef = useRef(0);
+  const HasInitialLoaded = useRef(false);
+  const TimelineRef = useRef<gsap.core.Timeline | null>(null);
 
-  const [ProgressStatus, setProgressStatus] = useState(0);
+  const scroller = useScroll();
 
-  const lenis = useLenis((l) => {});
+  useEffect(() => {
+    if (!loaded) return;
 
-  lenis?.on("scroll", (l) => {
-    const p = l.progress;
-    ProgressRef.current = p;
-    ProgressStatusRef.current.innerHTML = `${Math.floor(ProgressRef.current * 100)}%`;
-    gsap.killTweensOf([ProgressBarRef.current]);
-    gsap.to(ProgressBarRef.current, {
-      scaleX: p,
-    });
-  });
+    const update = ({ progress }: { progress: number }) => {
+      ProgressRef.current = progress;
+
+      if (scene === "sceneA") {
+        if (ProgressStatusRef.current) {
+          const percent = Math.floor(progress * 100)
+            .toString()
+            .padStart(2, "0");
+
+          ProgressStatusRef.current!.innerHTML = `${percent}%`;
+
+          gsap.set(ProgressBarRef.current, {
+            scaleX: progress,
+          });
+        }
+
+        if (TimelineRef.current) {
+          const p = progress;
+          const startProg = SCENE_CONFIG.sceneA.startProg;
+          const endProg = SCENE_CONFIG.sceneA.endProg;
+          const prog =
+            Math.min(Math.max(p - startProg, 0), endProg - startProg) /
+            (endProg - startProg);
+          TimelineRef.current.progress(1 - prog);
+        }
+      }
+
+      if (scene == "sceneB" && TimelineRef.current) {
+        const p = progress;
+        const startProg = SCENE_CONFIG.sceneB.startProg;
+        const endProg = SCENE_CONFIG.sceneB.endProg;
+        const prog =
+          Math.min(Math.max(p - startProg, 0), endProg - startProg) /
+          (endProg - startProg);
+        TimelineRef.current.progress(prog);
+      }
+    };
+
+    scroller.on("update", update);
+
+    return () => {
+      scroller.off("update", update);
+    };
+  }, [scroller, scene, loaded]);
 
   useGSAP(() => {
-    console.clear();
-    window.scrollTo({
-      top: 0,
-      behavior: "instant",
-    });
-    setDomOverflow(document, "hidden");
-
-    let scrollTriggerInstance: ScrollTrigger | null = null;
     let Timelines: gsap.core.Timeline[] = [];
 
     document.fonts.ready.then(() => {
-      ProgressRef.current =
-        lenis?.progress || window.scrollY / window.scrollMaxY || 0;
-      ProgressStatusRef.current.innerHTML = `${Math.floor(ProgressRef.current * 100)}%`;
       const SplittedHeadings = SplitIt(HeadingRef.current);
       const SplittedHeadings2 = SplitIt(Heading2Ref.current);
       const SplittedDescription = SplitIt(DescriptionRef.current);
       const SplittedSys = SplitIt(SysRef.current);
       const SplittedCue = SplitIt(ScrollCueRef.current);
-      const SplittedProgressStatus = SplitIt(ProgressStatusRef.current);
 
-      ProgressStatusRef.current;
-
-      if (ProgressBarRef.current && ProgressBarParentRef.current) {
+      if (
+        ProgressBarRef.current &&
+        ProgressBarParentRef.current &&
+        scene == "sceneA"
+      ) {
         gsap.set([ProgressBarRef.current, ProgressBarParentRef.current], {
           opacity: 0,
           transformOrigin: "right",
@@ -86,32 +123,38 @@ const Content = ({
         }),
       );
 
-      [SplittedCue, SplittedProgressStatus].forEach((Elem) =>
-        gsap.set(Elem.words, {
-          opacity: 0,
-        }),
-      );
-      const HeadingTimeline = gsap.timeline({
-        onComplete: () => {
-          // once intro finishes, freeze it and let scroll control it
-          console.log("Completed");
-          setDomOverflow(document, "scroll");
-          HeadingTimeline.pause();
+      gsap.set([...SplittedCue.words, ProgressStatusRef.current], {
+        opacity: 0,
+      });
 
-          ScrollTrigger.create({
-            trigger: "main",
-            start: `top -${innerHeight}px`,
-            end: `+=${innerHeight}px`,
-            onUpdate(e) {
-              const p = e.progress;
-              HeadingTimeline.progress(1 - e.progress);
-            },
+      const HeadingTimeline = gsap.timeline({
+        paused: scene == "sceneB",
+        onStart() {
+          gsap.set(ContentRef.current, {
+            opacity: 1,
           });
         },
+        onComplete: () => {
+          if (HasInitialLoaded.current) return;
+          setLoaded(true);
+          HasInitialLoaded.current = true;
+          if (scene === "sceneA") {
+            HeadingTimeline.pause();
+          }
+        },
       });
+
+      // sceneB starts frozen at 0
+      if (scene === "sceneB") {
+        HeadingTimeline.pause();
+        HeadingTimeline.progress(0);
+      }
+
+      TimelineRef.current = HeadingTimeline;
       Timelines.push(HeadingTimeline);
+
       HeadingTimeline.to(SplittedHeadings.words, {
-        delay: 0.5,
+        delay: scene === "sceneA" ? 0.5 : 0,
         yPercent: 0,
         stagger: 0.07,
       });
@@ -146,32 +189,31 @@ const Content = ({
         },
         "<",
       );
-      HeadingTimeline.to(
-        [ProgressBarRef.current, ProgressBarParentRef.current],
-        {
+      if (scene == "sceneA") {
+        gsap.to(ProgressStatusRef.current, {
+          delay: HeadingTimeline.totalDuration(),
           opacity: 1,
-        },
-      );
-      HeadingTimeline.to(ProgressBarParentRef.current, {
-        opacity: 1,
-      });
-      HeadingTimeline.to(ProgressBarRef.current, {
-        scaleX: ProgressRef.current,
-      });
+          stagger: 0.07,
+        });
+        /* ProgBarTween =  */ gsap.to(ProgressBarRef.current, {
+          delay: HeadingTimeline.totalDuration(),
+          opacity: 1,
+        });
+        /* ProgBarParentTween =  */ gsap.to(ProgressBarParentRef.current, {
+          delay: HeadingTimeline.totalDuration(),
+          opacity: 1,
+        });
+      }
     });
 
-    // cleanup
     return () => {
-      setDomOverflow(document, "scroll");
-      scrollTriggerInstance?.kill();
       gsap.killTweensOf("*");
-      ScrollTrigger.getAll().forEach((st) => st.kill());
       Timelines.forEach((T) => T.kill());
     };
   });
 
   return (
-    <div ref={ContentRef} className="content">
+    <div ref={ContentRef} className={`content ${scene.toLowerCase()}`}>
       <div className="typo">
         <h1 ref={HeadingRef} className="heading inter">
           {heading}
@@ -190,12 +232,31 @@ const Content = ({
         <h3 ref={ScrollCueRef} className="scroll-cue poppins">
           {scrollCue}
         </h3>
-        <div ref={ProgressStatusRef} className="scroll-progress-number poppins">
-          {ProgressStatus}%
-        </div>
-        <div ref={ProgressBarParentRef} className="progress-bar">
-          <div ref={ProgressBarRef} className="progress-bar-inside"></div>
-        </div>
+        {scene == "sceneA" ? (
+          <>
+            <div
+              ref={ProgressStatusRef}
+              className="scroll-progress-number poppins"
+            >
+              00%
+            </div>
+            <div ref={ProgressBarParentRef} className="progress-bar">
+              <div ref={ProgressBarRef} className="progress-bar-inside"></div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div
+              style={{ opacity: 0 }}
+              className="scroll-progress-number poppins"
+            >
+              00%
+            </div>
+            <div style={{ opacity: 0 }} className="progress-bar">
+              <div className="progress-bar-inside"></div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -1,25 +1,19 @@
-import "lenis/dist/lenis.css";
-import { ReactLenis } from "lenis/react";
 import gsap from "gsap";
 import UI from "./components/ui";
-  import Experience from './scene/Experience'
+import Experience from "./scene/components/Experience";
 import { SplitText } from "gsap/SplitText";
+import { ScrollProvider } from "./components/scroll/scroll.provider";
 
 gsap.registerPlugin(SplitText);
 const App = () => {
   return (
-    <>
-    <div className="bg">
-      
-    </div>
-      <ReactLenis root />
+    <ScrollProvider paused={true} max={innerHeight * 10}>
+      <div className="bg"></div>
       <main className="app">
         <UI />
-        <div className="canvas w-full h-screen">
-        <Experience/>
-        </div>
+        <Experience />
       </main>
-    </>
+    </ScrollProvider>
   );
 };
 
