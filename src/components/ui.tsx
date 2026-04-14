@@ -4,8 +4,8 @@ import Content from "./content";
 const UI = () => {
   return (
     <div className="ui">
-      {/* <Content {...DATA.sceneA} /> */}
-      <Content {...DATA.sceneB} />
+      <Content scene="sceneA" {...DATA.sceneA} />
+      {/* <Content {...DATA.sceneB} /> */}
     </div>
   );
 };
