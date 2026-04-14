@@ -1,17 +1,22 @@
-import gsap from 'gsap'
-import UI from './components/ui'
-import { SplitText } from 'gsap/SplitText'
-import Experience from './scene/components/Experience'
+import "lenis/dist/lenis.css";
 
+import { ReactLenis, useLenis } from "lenis/react";
+import gsap from "gsap";
+import UI from "./components/ui";
+  import Experience from './scene/components/Experience'
+import { SplitText } from "gsap/SplitText";
 
-gsap.registerPlugin(SplitText)
+gsap.registerPlugin(SplitText);
 const App = () => {
   return (
-    <main className='app'>
-      <UI />
-    <Experience/>
-    </main>
-  )
-}
+    <>
+      <ReactLenis root />
+      <main className="app">
+        <UI />
+        <Experience/>
+      </main>
+    </>
+  );
+};
 
-export default App
+export default App;
