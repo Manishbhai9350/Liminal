@@ -1,32 +1,41 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { DATA } from "../config/data";
 import Content from "./content";
 import { setDomOverflow } from "../utils";
+import { useScroll } from "./scroll/useScroll";
 
 const UI = () => {
   const [LoadedA, setLoadedA] = useState<boolean>(false);
   const [LoadedB, setLoadedB] = useState(false);
 
-  useEffect(() => {
-    console.log(LoadedA, LoadedB);
-    
-    if (LoadedA && LoadedB) {
-      setDomOverflow(document, "auto");
-    } else {
-      window.scrollTo({
-        top:0,
-        behavior:'instant'
-      })
-      setDomOverflow(document, "hidden");
-    }
+  const scroller = useScroll()
 
-    return () => {};
-  }, [LoadedA, LoadedB]);
+  useEffect(() => {
+    
+    if(LoadedA && LoadedB) {
+      scroller.resume();
+    }
+  
+    return () => {
+      
+    }
+  }, [LoadedA,LoadedB])
+  
 
   return (
     <div className="ui">
-      <Content setLoaded={setLoadedA} scene="sceneA" {...DATA.sceneA} />
-      <Content setLoaded={setLoadedB} scene="sceneB" {...DATA.sceneB} />
+      <Content
+        loaded={LoadedA}
+        setLoaded={setLoadedA}
+        scene="sceneA"
+        {...DATA.sceneA}
+      />
+      <Content
+        loaded={LoadedB}
+        setLoaded={setLoadedB}
+        scene="sceneB"
+        {...DATA.sceneB}
+      />
     </div>
   );
 };

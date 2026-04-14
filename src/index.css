@@ -8,23 +8,9 @@
 
 html,
 body {
+  color: white;
   width: 100%;
   height: 100vh !important;
-  color: white;
-  /* overflow: hidden; */
-}
-html {
-
-}
-
-.bg {
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 997;
-  background: url("/Design/bg.jpeg") center center / cover no-repeat;
 }
 
 .poppins {
@@ -39,12 +25,21 @@ html {
   font-style: normal;
 }
 
+.bg {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 997;
+  background: url("/Design/bg.jpeg") center center / cover no-repeat;
+}
+
 main.app {
   width: 100vw;
   height: 100%;
-  height: 1000vh;
+  height: 100vh;
   position: relative;
-  /* overflow: hidden; */
 }
 
 .canvas {
@@ -173,6 +168,48 @@ main.app {
           transform-origin: right;
           transform: scaleX(0);
         }
+      }
+    }
+  }
+}
+
+@media (min-width: 900px) {
+  main.app {
+    .content {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      .typo {
+        width: 60% !important;
+        height: 100%;
+        flex-direction: column;
+        justify-content: center;
+        .heading {
+          font-size: 4rem;
+          /* max-width: 700px; */
+        }
+      }
+      .sub-typo {
+        flex-direction: column;
+        justify-content: center;
+        width: 40%;
+        flex: 1;
+      }
+    }
+    .content.scenea {
+      .typo .heading {
+        max-width: 450px !important;
+      }
+      .typo .description {
+        max-width: 450px !important;
+      }
+    }
+    .content.sceneb {
+      .typo .heading {
+        max-width: 700px !important;
+      }
+      .typo .description {
+        max-width: 500px !important;
       }
     }
   }

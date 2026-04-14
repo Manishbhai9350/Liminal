@@ -14,7 +14,7 @@ export const SplitIt = (elem: gsap.DOMTarget, vars?: SplitText.Vars) => {
 };
 
 export const setDomOverflow = (document: Document, overflow: string) => {
-  document.documentElement.style.overflow = overflow;
-  // document.body.style.overflow = overflow;
-  console.log(overflow)
+  // document.documentElement.style.overflow = overflow;
+  document.body.style.overflow = overflow;
+  // document.body.setAttribute("data-lenis-prevent", overflow == "hidden" ?  "true" : "");
 };
