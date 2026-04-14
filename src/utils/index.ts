@@ -14,8 +14,7 @@ export const SplitIt = (elem: gsap.DOMTarget, vars?: SplitText.Vars) => {
 };
 
 export const setDomOverflow = (document: Document, overflow: string) => {
-  return;
   document.documentElement.style.overflow = overflow;
-  document.body.style.overflow = overflow;
+  // document.body.style.overflow = overflow;
   console.log(overflow)
 };
