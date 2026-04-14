@@ -1,38 +1,53 @@
 import * as THREE from 'three'
 import React, { useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
+import { useControls } from "leva";
 
-type GLTFResult = GLTF & {
-    nodes: {
-      Object_6: THREE.SkinnedMesh
-      Object_7: THREE.SkinnedMesh
-      _rootJoint: THREE.Bone
-    }
-    materials: {
-      Material_357: THREE.MeshPhysicalMaterial
-      Material_349: THREE.MeshStandardMaterial
-    }
+type GLTFResult = {
+  nodes: {
+    Object_6: THREE.SkinnedMesh
+    Object_7: THREE.SkinnedMesh
+    _rootJoint: THREE.Bone
   }
-
-const redChrome = {
-  color:              "#cc0a0a",      // deep saturated red base
-  metalness:          0.7,
-  roughness:          0.2,           // near-mirror for the wet gloss
-  clearcoat:          1.0,
-  clearcoatRoughness: 0.04,
-  reflectivity:       1.0,
-  envMapIntensity:    2.2,
-  specularIntensity:  1.2,
-  specularColor:      "#ff9999",      // warm pinkish-white highlight
-  sheen:              0.4,
-  sheenColor:         "#8b0000",      // dark-red sheen for depth
-  attenuationColor:   "#5a0000",
-  attenuationDistance:2,
+  materials: {
+    Material_357: THREE.MeshPhysicalMaterial
+    Material_349: THREE.MeshStandardMaterial
+  }
 }
 
 export function Hand2(props: React.ComponentProps<'group'>) {
   const group = useRef<THREE.Group>(null)
   const { nodes } = useGLTF('/models/The Hand 3D Model.glb') as unknown as GLTFResult
+
+  const {
+    color,
+    metalness,
+    roughness,
+    clearcoat,
+    clearcoatRoughness,
+    reflectivity,
+    envMapIntensity,
+    specularIntensity,
+    specularColor,
+    sheen,
+    sheenColor,
+    attenuationColor,
+    attenuationDistance,
+  } = useControls("Hand2 Material", {
+    color: { value: "#cc0a0a" },               
+    metalness: { value: 0.7, min: 0, max: 1, step: 0.01 },
+    roughness: { value: 0.2, min: 0, max: 1, step: 0.01 }, 
+    clearcoat: { value: 1.0, min: 0, max: 1, step: 0.01 },
+    clearcoatRoughness: { value: 0.04, min: 0, max: 1, step: 0.01 },
+    reflectivity: { value: 1.0, min: 0, max: 1, step: 0.01 },
+    envMapIntensity: { value: 2.2, min: 0, max: 10, step: 0.1 },
+    specularIntensity: { value: 1.2, min: 0, max: 5, step: 0.01 },
+    specularColor: { value: "#ff9999" },         
+    sheen: { value: 0.4, min: 0, max: 1, step: 0.01 },
+    sheenColor: { value: "#8b0000" },            
+    attenuationColor: { value: "#5a0000" },
+    attenuationDistance: { value: 2, min: 0, max: 10, step: 0.01 },
+  });
 
   return (
     <group ref={group} {...props} dispose={null}>
@@ -47,7 +62,6 @@ export function Hand2(props: React.ComponentProps<'group'>) {
                 <group name="Object_4">
                   <primitive object={nodes._rootJoint} />
 
-                  {/* Override both skinned meshes with red chrome */}
                   <skinnedMesh
                     name="Object_6"
                     geometry={nodes.Object_6.geometry}
@@ -55,7 +69,21 @@ export function Hand2(props: React.ComponentProps<'group'>) {
                     castShadow
                     receiveShadow
                   >
-                    <meshPhysicalMaterial {...redChrome} />
+                    <meshPhysicalMaterial
+                      color={color}
+                      metalness={metalness}
+                      roughness={roughness}
+                      clearcoat={clearcoat}
+                      clearcoatRoughness={clearcoatRoughness}
+                      reflectivity={reflectivity}
+                      envMapIntensity={envMapIntensity}
+                      specularIntensity={specularIntensity}
+                      specularColor={specularColor}
+                      sheen={sheen}
+                      sheenColor={sheenColor}
+                      attenuationColor={attenuationColor}
+                      attenuationDistance={attenuationDistance}
+                    />
                   </skinnedMesh>
 
                   <skinnedMesh
@@ -65,7 +93,21 @@ export function Hand2(props: React.ComponentProps<'group'>) {
                     castShadow
                     receiveShadow
                   >
-                    <meshPhysicalMaterial {...redChrome} />
+                    <meshPhysicalMaterial
+                      color={color}
+                      metalness={metalness}
+                      roughness={roughness}
+                      clearcoat={clearcoat}
+                      clearcoatRoughness={clearcoatRoughness}
+                      reflectivity={reflectivity}
+                      envMapIntensity={envMapIntensity}
+                      specularIntensity={specularIntensity}
+                      specularColor={specularColor}
+                      sheen={sheen}
+                      sheenColor={sheenColor}
+                      attenuationColor={attenuationColor}
+                      attenuationDistance={attenuationDistance}
+                    />
                   </skinnedMesh>
 
                   <group name="SK_Gauntlet" />

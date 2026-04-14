@@ -36,13 +36,14 @@ main.app {
 }
 
 
-.canvas-scene {
-  z-index: 9999;
-  position: fixed;
-  top: 0%;
-  left: 0%;
+.canvas {
   width: 100vw;
   height: 100vh;
+  position: fixed;
+  z-index: 9999;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   /* display: none; */
 }
 
