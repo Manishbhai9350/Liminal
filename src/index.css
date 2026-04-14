@@ -9,7 +9,7 @@
 html,
 body {
   width: 100%;
-  height: 100%;
+  height: 100vh!important;
   color: white;
   /* overflow: hidden; */
 }
@@ -29,7 +29,7 @@ body {
 main.app {
   width: 100vw;
   height: 100%;
-  height: 500vh;
+  height: 1000vh;
   position: relative;
   /* overflow: hidden; */
   background: linear-gradient(to bottom, red , blue);
@@ -125,17 +125,42 @@ main.app {
         font-size: 1.3rem;
       }
       .progress-bar {
-        width: 30vw;
+        width: 150px;
         height: 6px;
         overflow: hidden;
         border-radius: 1.2px;
         background: rgba(255, 255, 255, 0.537);
+        &::before {
+          content:'';
+          width: 3px;
+          height: 100%;
+          background: rgba(255, 255, 255, 0.48);
+          z-index: 10;
+          position: absolute;
+          top: 0;
+          right: 40%;
+          display: none;
+          /* transform: translateX(100%); */
+        }
+        &::after {
+          content:'';
+          width: 3px;
+          height: 100%;
+          background: rgba(255, 255, 255, 0.48);
+          z-index: 10;
+          position: absolute;
+          top: 0;
+          right: 60%;
+          display: none;
+        }
         .progress-bar-inside {
+          position: relative;
+          z-index: 11;
           width: 100%;
           height: 100%;
           background: white;
           transform-origin: right;
-          transform: scaleX(0.13);
+          transform: scaleX(0);
         }
       }
     }
