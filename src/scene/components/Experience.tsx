@@ -1,7 +1,7 @@
 import { Canvas } from "@react-three/fiber";
 import { Environment, Stats } from "@react-three/drei";
 import * as THREE from "three";
-import Scene from "./components/scene";
+import Scene from "./scene";
 import { Leva, useControls, folder } from "leva";
 
 const Experience = () => {

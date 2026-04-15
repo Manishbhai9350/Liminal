@@ -12,6 +12,9 @@ body {
   width: 100%;
   height: 100vh !important;
 }
+body {
+  /* background: url("/Design/bg.jpeg") center center / cover no-repeat; */
+}
 
 .bg {
   width: 100vw;
@@ -20,7 +23,8 @@ body {
   top: 0;
   left: 0;
   z-index: 997;
-  background: url("/Design/bg.jpeg") center center / cover no-repeat;
+  /* background: url("/Design/bg.jpeg") center center / cover no-repeat; */
+  display:none;
 }
 
 .poppins {
@@ -35,15 +39,6 @@ body {
   font-style: normal;
 }
 
-.bg {
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 997;
-  background: url("/Design/bg.jpeg") center center / cover no-repeat;
-}
 
 main.app {
   width: 100vw;
