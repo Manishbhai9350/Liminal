@@ -122,7 +122,7 @@ const Experience = () => {
         className="canvas-scene"
         shadows
         gl={{
-          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMapping: THREE.NeutralToneMapping,
           toneMappingExposure: 1.4,
         }}
       >
