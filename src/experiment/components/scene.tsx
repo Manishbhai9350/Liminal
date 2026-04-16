@@ -80,9 +80,9 @@ const TransitionScene = () => {
   }, [bg1, bg2, ProgressUn]);
 
   return (
-    <mesh material={NodeMat}>
+    <mesh /* material={NodeMat} */>
       <planeGeometry args={[width, height]} />
-      {/* <TransitionMaterial bg1={bg1} bg2={bg2} /> */}
+      <TransitionMaterial bg1={bg1} bg2={bg2} />
       {/* <meshBasicMaterial map={bg1} /> */}
     </mesh>
   );

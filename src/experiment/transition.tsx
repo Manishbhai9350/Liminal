@@ -7,11 +7,11 @@ const TransitionPage = () => {
   return (
     <div className="transition-page">
       <Canvas
-        gl={async (props) => {
-          const renderer = new WebGPURenderer(props);
-          await renderer.init(); // ⚠️ REQUIRED for WebGPU
-          return renderer;
-        }}
+        // gl={async (props) => {
+        //   const renderer = new WebGPURenderer(props);
+        //   await renderer.init(); // ⚠️ REQUIRED for WebGPU
+        //   return renderer;
+        // }}
       >
         <TransitionScene />
       </Canvas>

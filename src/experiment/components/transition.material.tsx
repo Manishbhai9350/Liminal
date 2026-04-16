@@ -1,11 +1,13 @@
 import { useControls } from "leva";
 import { useEffect, useMemo, useRef } from "react";
 import type { Texture } from "three";
-import { ShaderMaterial, Vector2 } from "three/webgpu";
+import { ShaderMaterial, Vector2, Vector3 } from "three/webgpu";
 import {
   fragmentShader,
   fragmentShader1,
   vertexShader,
+  TransitionVertex,
+  TransitionFragment,
 } from "./shaders/shader";
 import { shaderMaterial } from "@react-three/drei";
 import { extend, useFrame, useThree } from "@react-three/fiber";
@@ -17,13 +19,25 @@ interface TransitionProps {
 
 const TMat = shaderMaterial(
   {
-    iTime: 0,
-    iResolution: new Vector2(innerWidth, innerHeight),
-    iChannel0: null,
-    iChannel1: null,
+    // textures
+    tScene1: null,
+    tScene2: null,
+    tSection: null,
+    tTechNoise: null,
+    uResolution: new Vector2(),
+    uMask: new Vector3(),
+    uProgress: 0,
+    uProgressVel: 0,
+    uSectionProgress: 0,
+    uWaveSize: 1,
+    uMaskRadius: 0.18,
+    uInnerDistortion: -1.4,
+    uRadius: 0,
+    uWaveGlow: 5,
+    uTime: 0,
   },
-  vertexShader,
-  fragmentShader1,
+  TransitionVertex,
+  TransitionFragment,
 );
 
 extend({ TMat });
@@ -73,20 +87,28 @@ const TransitionMaterial = ({ bg1, bg2 }: TransitionProps) => {
   useEffect(() => {
     if (!ref.current) return;
 
-    ref.current.iChannel0 = bg1;
-    ref.current.iChannel1 = bg2;
+    ref.current.tScene1 = bg1;
+    ref.current.tScene2 = bg2;
+
+    // optional (can be same as bg1 for now)
+    ref.current.tSection = bg2;
+    ref.current.tTechNoise = bg1; // better if you load a noise texture later
   }, [bg1, bg2]);
 
   // update every frame
   useFrame((state) => {
     if (!ref.current) return;
 
-    ref.current.iTime = state.clock.getElapsedTime();
+    ref.current.uTime = state.clock.getElapsedTime();
 
-    ref.current.iResolution.set(size.width, size.height);
+    ref.current.uResolution.set(size.width, size.height);
 
-    // 🔥 optional: drive something later
-    ref.current.progress = progress;
+    ref.current.uProgress = progress;
+
+    // optional animations
+    ref.current.uWaveSize = 1.0;
+    ref.current.uInnerDistortion = 0.5;
+    ref.current.uWaveGlow = 0.3;
   });
 
   return <tMat ref={ref} />;
