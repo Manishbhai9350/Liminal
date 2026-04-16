@@ -9,7 +9,7 @@ import TransitionPage from "./experiment/transition";
 gsap.registerPlugin(SplitText);
 const App = () => {
   const path = useRoute();
-  // if (path === "/") {
+  if (path === "/") {
     return (
       <ScrollProvider paused={true} max={innerHeight * 10}>
         <div className="bg"></div>
@@ -19,9 +19,9 @@ const App = () => {
         </main>
       </ScrollProvider>
     );
-  // } else if (path === "/transition") {
-    // return <TransitionPage />;
-  // }
+  } else if (path === "/transition") {
+    return <TransitionPage />;
+  }
 };
 
 export default App;
