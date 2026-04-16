@@ -10,17 +10,17 @@ gsap.registerPlugin(SplitText);
 const App = () => {
   const path = useRoute();
   // if (path === "/") {
-  //   return (
-  //     <ScrollProvider paused={true} max={innerHeight * 10}>
-  //       <div className="bg"></div>
-  //       <main className="app">
-  //         <UI />
-  //         <Experience />
-  //       </main>
-  //     </ScrollProvider>
-  //   );
+    return (
+      <ScrollProvider paused={true} max={innerHeight * 10}>
+        <div className="bg"></div>
+        <main className="app">
+          <UI />
+          <Experience />
+        </main>
+      </ScrollProvider>
+    );
   // } else if (path === "/transition") {
-    return <TransitionPage />;
+    // return <TransitionPage />;
   // }
 };
 

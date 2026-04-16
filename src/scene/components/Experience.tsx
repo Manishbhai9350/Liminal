@@ -129,7 +129,7 @@ const Experience = () => {
         <Stats />
         {/* <OrbitControls enableDamping /> */}
 
-        <Environment preset="city" background={false} />
+        {/* <Environment preset="city" background={false} /> */}
 
         <ambientLight intensity={ambientIntensity} color={ambientColor} />
 

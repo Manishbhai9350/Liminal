@@ -13,7 +13,7 @@ body {
   height: 100vh !important;
 }
 body {
-  /* background: url("/Design/bg.jpeg") center center / cover no-repeat; */
+  background: url("/Design/bg.jpeg") center center / cover no-repeat;
 }
 
 .bg {
