@@ -78,7 +78,7 @@ const TransitionMaterial = ({ bg1, bg2 }: TransitionProps) => {
     progress: {
       value: 0,
       min: 0,
-      max: 1.2,
+      max: 1,
       step: 0.001,
     },
   });
