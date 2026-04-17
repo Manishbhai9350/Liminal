@@ -70,7 +70,6 @@ const TransitionScene = () => {
 
       const ring = t;
 
-
       const color = mix(BG1,BG2,ring);
 
       return color;

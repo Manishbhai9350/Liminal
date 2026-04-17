@@ -2,6 +2,7 @@ import "./transition.css";
 import { Canvas } from "@react-three/fiber";
 import TransitionScene from "./components/scene";
 import { WebGPURenderer } from "three/webgpu";
+import { CameraControls, OrbitControls } from "@react-three/drei";
 
 const TransitionPage = () => {
   return (
@@ -13,6 +14,7 @@ const TransitionPage = () => {
         //   return renderer;
         // }}
       >
+        {/* <OrbitControls makeDefault /> */}
         <TransitionScene />
       </Canvas>
     </div>
