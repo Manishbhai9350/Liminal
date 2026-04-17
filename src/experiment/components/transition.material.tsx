@@ -29,11 +29,11 @@ const TMat = shaderMaterial(
     uProgress: 0,
     uProgressVel: 0,
     uSectionProgress: 0,
-    uWaveSize: 1,
+    uWaveSize: 2,
     uMaskRadius: 0.18,
     uInnerDistortion: -1.4,
     uRadius: 0,
-    uWaveGlow: 5,
+    uWaveGlow: 10,
     uTime: 0,
   },
   TransitionVertex,
@@ -78,7 +78,7 @@ const TransitionMaterial = ({ bg1, bg2 }: TransitionProps) => {
     progress: {
       value: 0,
       min: 0,
-      max: 1,
+      max: 1.2,
       step: 0.001,
     },
   });
@@ -100,8 +100,11 @@ const TransitionMaterial = ({ bg1, bg2 }: TransitionProps) => {
     if (!ref.current) return;
 
     ref.current.uTime = state.clock.getElapsedTime();
+    // let n = e.getPixelRatio(),
+    //             i = window.innerWidth * n,
+    //             a = window.innerHeight * n;
 
-    ref.current.uResolution.set(size.width, size.height);
+    ref.current.uResolution.set(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio);
 
     ref.current.uProgress = progress;
 

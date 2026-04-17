@@ -33,7 +33,8 @@ const TransitionScene = () => {
     },
   });
 
-  const [bg1, bg2] = useTexture(["Design/bg2.jpeg", "Design/bg.jpeg"]);
+  // const [bg1, bg2] = useTexture(["Design/bg2.jpeg", "Design/bg.jpeg"]);
+  const [bg1, bg2] = useTexture(["Design/8bita.png", "Design/8bitb.png"]);
   // const [bg1, bg2] = useCubeTexture(["Design/bg2.jpeg", "Design/bg.jpeg"], {
   //   path: "Design/",
   // });
@@ -69,6 +70,7 @@ const TransitionScene = () => {
       const mask = step(inner, ln).mul(float(1).sub(step(outer, ln)));
 
       const ring = t;
+
 
       const color = mix(BG1,BG2,ring);
 
