@@ -106,7 +106,8 @@ const scrollProg = useRef(0);
 
 useEffect(() => {
   const handleUpdate = (data: { progress: number; current: number; target: number }) => {
-    scrollProg.current = data.progress + 0.3;
+    // scrollProg.current = data.progress + 0.3;
+    scrollProg.current = progress;
     // Try using document.body.classList for background switching
     const body = document.body;
     if (body) {
@@ -135,7 +136,7 @@ useEffect(() => {
 
     ref.current.uResolution.set(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio);
 
-    ref.current.uProgress = scrollProg.current;
+    ref.current.uProgress = progress;
 
     // optional animations
     ref.current.uWaveSize = 1.0;
