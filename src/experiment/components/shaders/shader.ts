@@ -123,28 +123,9 @@ export const fragmentShader = `
 export const TransitionVertex = /* glsl */ `
 
 varying vec2 vUv;
-varying float vWave;
-
-uniform float uTime;
-uniform float aspect;
-uniform float progress;
-
-float PI = 3.141592653589793;
-
-float Circle(vec2 uv, float threshold, float progress) {
-    return smoothstep(threshold, 0.0, length(uv) - progress + threshold);
-}
 
 void main() {
     vUv = uv;
-
-    // Center and aspect correct UV
-    vec2 centeredUV = (uv - 0.5) * vec2(aspect, 1.0);
-    float time = uTime * 2.5;
-
-    float circleWave = Circle(centeredUV, 0.3, progress);
-
-    vWave = circleWave * smoothstep(0.0, 2.0, abs(sin(time + circleWave * PI * 2.0)));
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
@@ -266,63 +247,39 @@ void main() {
     float progress = cubicIn(uProgress);
     float aspect = uResolution.x / uResolution.y;
 
-    // if(progress > 0.0) {
+    if(progress > 0.0) {
 
-        vec2 centeredUV = (vUv - 0.5)  * vec2(aspect, 1.0);
+        vec2 centeredUV = (vUv - 0.5) * vec2(aspect, 1.0);
         float time = uTime * 2.5;
 
         float circleWave = Circle(centeredUV, 0.3, progress);
 
-        float wave = circleWave * smoothstep(0.0, 2.0, abs(sin(time + circleWave * PI * 2.0)));
-
-        // color = vec3(length(centeredUV),0.0,0.0);
-        // color = vec3(wave,wave,circleWave);
+        float wave = circleWave * smoothstep(0.0, 2.0, abs(sin(time + circleWave * PI * 3.0)));
 
         float height = 0.7;
 
         vec2 uv1 = Mul(vUv, 1.0 - (circleWave + wave) * height);
-        vec3 tDiffuse1 = texture2D(tScene1, vUv).rgb;
+        vec3 tDiffuse1 = texture2D(tScene1, uv1).rgb;
 
-        // color = vec3(vUv.x,vUv.y,0.0);
-
-        // color = tDiffuse1;
-        color = vec3(.6,.9,.3);
+        color = tDiffuse1;
 
         float circleMask = Circle(centeredUV, 0.075 * progress, progress - uMaskRadius);
 
         float circleInnerDistortion = Circle(centeredUV, 0.25 * progress, progress - uMaskRadius);
         vec2 uv2 = Mul(vUv, 1.0 + (uInnerDistortion - circleInnerDistortion * uInnerDistortion));
-        vec3 tDiffuse2 = texture2D(tScene2, vUv).rgb;
+        vec3 tDiffuse2 = texture2D(tScene2, uv2).rgb;
 
-        // color = mix(tDiffuse1, tDiffuse2, circleMask);
-        color = mix(tDiffuse1, vec3(.6,.9,.3), circleMask);
+        color = mix(tDiffuse1, tDiffuse2, circleMask);
 
         float waveColor = wave * uWaveGlow * (1.0 - Circle(centeredUV, 0.1, progress - 0.1));
         color += waveColor;
 
         color *= 1.0 - 0.7 * clamp(0.0, 1.0, circleMask - Circle(centeredUV + vec2(-0.1, 0.1) * progress, 0.175 * progress, progress - uMaskRadius));
 
-
-        // Bending UVs
-        float BendMask = Circle(centeredUV, 0.06 * progress, progress * .8 - uMaskRadius);
-        float BendRing = circleMask - BendMask;
-
-        color = vec3(BendRing);
-
-        // color = vec3(wave * uWaveGlow,(1.0 - Circle(centeredUV, 0.1, progress - 0.1)),0.0);
-
-
-    // } else {
-        // vec2 uv = vUv * vec2(aspect,1.0);
-        // color = texture2D(tScene1, uv).rgb;
-        // color = vec3(uv,0.0);
-    // }
-
-    if(color.r < 1.0) {
-        gl_FragColor = vec4(tDiffuse1,1.0);
     } else {
-        gl_FragColor = vec4(color,1.0);
+        color = texture2D(tScene1, vUv).rgb;
     }
+    gl_FragColor = vec4(color, 1.0);
 
 }
 
