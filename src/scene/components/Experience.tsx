@@ -157,42 +157,24 @@ const Experience = () => {
       <Leva collapsed />
       <Canvas
         className="canvas-scene"
-        shadows
+        // shadows
         gl={{
-          toneMapping: THREE.NeutralToneMapping,
+          toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.4,
         }}
       >
         <Stats />
-
-        <Transition
-          scene1={
-            <>
-              {lights}
-              {ibl}
-              <Scene1
-                scale={scale}
-                position={[posX as number, posY as number, posZ as number]}
-                rotation={[rotX, rotY, rotZ]}
-              />
-            </>
-          }
-          scene2={
-            <>
-              {lights}
-              {ibl}
-              <Scene2
-                scale={scale2}
-                position={[
-                  posX2 as number,
-                  posY2 as number,
-                  posZ2 as number,
-                ]}
-                rotation={[rotX2, rotY2, rotZ2]}
-              />
-            </>
-          }
+        {lights}
+        <Scene1
+          scale={scale}
+          position={[posX as number, posY as number, posZ as number]}
+          rotation={[rotX, rotY, rotZ]}
         />
+        {/* <Scene2
+          scale={scale2}
+          position={[posX2 as number, posY2 as number, posZ2 as number]}
+          rotation={[rotX2, rotY2, rotZ2]}
+        /> */}
       </Canvas>
     </>
   );
