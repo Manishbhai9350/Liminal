@@ -97,22 +97,22 @@ const Experience = () => {
     }),
     "Model-2": folder({
       posX2: { value: 0, min: -10, max: 10, step: 0.1 },
-      posY2: { value: 0.5, min: -10, max: 10, step: 0.1 },
+      posY2: { value: -2, min: -10, max: 10, step: 0.1 },
       posZ2: { value: 0, min: -10, max: 10, step: 0.1 },
-      scale2: { value: 3.5, min: 0.1, max: 5, step: 0.01 },
+      scale2: { value: 400.0, min: 0.1, max: 500, step: 0.01 },
       rotX2: {
-        value: Math.PI / 2,
+        value: -0.2,
         min: -Math.PI * 2,
         max: Math.PI * 2,
         step: 0.01,
       },
       rotY2: {
-        value: Math.PI / 2,
+        value: -4.5,
         min: -Math.PI * 2,
         max: Math.PI * 2,
         step: 0.01,
       },
-      rotZ2: { value: 0, min: -Math.PI * 2, max: Math.PI * 2, step: 0.01 },
+      rotZ2: { value: -4.7, min: -Math.PI * 2, max: Math.PI * 2, step: 0.01 },
     }),
   });
 

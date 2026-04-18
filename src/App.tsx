@@ -20,7 +20,11 @@ const App = () => {
       </ScrollProvider>
     );
   } else if (path === "/transition") {
-    return <TransitionPage />;
+    return (
+      <ScrollProvider max={innerHeight * 10}>
+        <TransitionPage />;
+      </ScrollProvider>
+    );
   }
 };
 

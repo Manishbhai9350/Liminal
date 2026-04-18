@@ -17,7 +17,7 @@ type GLTFResult = {
 
 export function Hand2(props: React.ComponentProps<'group'>) {
   const group = useRef<THREE.Group>(null)
-  const { nodes } = useGLTF('/models/The Hand 3D Model.glb') as unknown as GLTFResult
+  const { nodes } = useGLTF('/models/the_hand.glb') as unknown as GLTFResult
 
   const {
     color,

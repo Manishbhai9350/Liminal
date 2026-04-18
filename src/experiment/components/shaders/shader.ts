@@ -239,6 +239,7 @@ vec2 Mul(vec2 uv, float value) {
     return uv;
 }
 
+
 // ---------------- MAIN ----------------
 
 void main() {
@@ -248,9 +249,11 @@ void main() {
     float aspect = uResolution.x / uResolution.y;
 
     if(progress > 0.0) {
+        
+
 
         vec2 centeredUV = (vUv - 0.5) * vec2(aspect, 1.0);
-        float time = uTime * 2.5;
+        float time = uTime * .5;
 
         float circleWave = Circle(centeredUV, 0.3, progress);
 
@@ -258,10 +261,29 @@ void main() {
 
         float height = 0.7;
 
+        // vec2 Mul(vec2 uv, float value) {
+        //     uv -= 0.5;
+        //     uv *= value;
+        //     uv += 0.5;
+        //     return uv;
+        // }
+
         vec2 uv1 = Mul(vUv, 1.0 - (circleWave + wave) * height);
         vec3 tDiffuse1 = texture2D(tScene1, uv1).rgb;
 
-        color = tDiffuse1;
+        // color = tDiffuse1;
+
+        
+
+        // color = vec3(Mul(vUv, (circleWave + wave) * height), 0.); 
+        // Experiemnt basicly this code make a circle and wave 
+        // vec2 ourUV = vec3(Mul(vUv, 1. - (circleWave + wave) * height), 0.).rg;
+        // vec3 tex = texture2D(tScene1, ourUV).rgb;        
+        // color = tex;
+        // Experiemnt ends here
+
+
+
 
         float circleMask = Circle(centeredUV, 0.075 * progress, progress - uMaskRadius);
 
@@ -269,7 +291,14 @@ void main() {
         vec2 uv2 = Mul(vUv, 1.0 + (uInnerDistortion - circleInnerDistortion * uInnerDistortion));
         vec3 tDiffuse2 = texture2D(tScene2, uv2).rgb;
 
+        // color = vec3( Mul(vUv, 1.0 + (uInnerDistortion - circleInnerDistortion * uInnerDistortion)), 0.0);
+        
+
+        // color = vec3(vUv,0.) * vec3((uInnerDistortion * 2.0 - circleInnerDistortion) + 1.);
+        // color = vec3(vUv,0.);
+
         color = mix(tDiffuse1, tDiffuse2, circleMask);
+
 
         float waveColor = wave * uWaveGlow * (1.0 - Circle(centeredUV, 0.1, progress - 0.1));
         color += waveColor;
