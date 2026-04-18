@@ -1,8 +1,9 @@
 import { Canvas } from "@react-three/fiber";
 import { Environment, Stats } from "@react-three/drei";
 import * as THREE from "three";
-import Scene from "./scene";
 import { Leva, useControls, folder } from "leva";
+import Transition from "./Transition";
+import { Scene1, Scene2 } from "./scene";
 
 const Experience = () => {
   const {
@@ -76,18 +77,18 @@ const Experience = () => {
       pointPosZ: { value: -8, min: -20, max: 20, step: 0.1 },
     }),
     "Model-1": folder({
-      posX: { value: 0, min: -10, max: 10, step: 0.1 },
-      posY: { value: -8, min: -10, max: 10, step: 0.1 },
-      posZ: { value: 0, min: -10, max: 10, step: 0.1 },
-      scale: { value: 1.3, min: 0.1, max: 5, step: 0.01 },
+      posX: { value: -2.7, min: -10, max: 10, step: 0.1 },
+      posY: { value: -12, min: -15, max: 10, step: 0.1 },
+      posZ: { value: -10, min: -10, max: 10, step: 0.1 },
+      scale: { value: 0.7, min: 0.1, max: 5, step: 0.01 },
       rotX: {
-        value: -Math.PI - 0.6,
+        value: 0.25,
         min: -Math.PI * 2,
         max: Math.PI * 2,
         step: 0.01,
       },
       rotY: {
-        value: Math.PI / 2 + 0.3,
+        value: 4.55,
         min: -Math.PI * 2,
         max: Math.PI * 2,
         step: 0.01,
@@ -115,6 +116,42 @@ const Experience = () => {
     }),
   });
 
+  const ibl = (
+    <Environment preset="city" environmentIntensity={1} background={false} />
+  );
+
+  const lights = (
+    <>
+      <ambientLight intensity={ambientIntensity} color={ambientColor} />
+
+      <directionalLight
+        castShadow
+        position={[dir1PosX, dir1PosY, dir1PosZ]}
+        intensity={dir1Intensity}
+        color={dir1Color}
+        shadow-mapSize={[2048, 2048]}
+      />
+
+      <directionalLight
+        position={[dir2PosX, dir2PosY, dir2PosZ]}
+        intensity={dir2Intensity}
+        color={dir2Color}
+      />
+
+      <directionalLight
+        position={[dir3PosX, dir3PosY, dir3PosZ]}
+        intensity={dir3Intensity}
+        color={dir3Color}
+      />
+
+      <pointLight
+        position={[pointPosX, pointPosY, pointPosZ]}
+        intensity={pointIntensity}
+        color={pointColor}
+      />
+    </>
+  );
+
   return (
     <>
       <Leva collapsed />
@@ -127,45 +164,34 @@ const Experience = () => {
         }}
       >
         <Stats />
-        {/* <OrbitControls enableDamping /> */}
 
-        {/* <Environment preset="city" background={false} /> */}
-
-        <ambientLight intensity={ambientIntensity} color={ambientColor} />
-
-        <directionalLight
-          castShadow
-          position={[dir1PosX, dir1PosY, dir1PosZ]}
-          intensity={dir1Intensity}
-          color={dir1Color}
-          shadow-mapSize={[2048, 2048]}
-        />
-
-        <directionalLight
-          position={[dir2PosX, dir2PosY, dir2PosZ]}
-          intensity={dir2Intensity}
-          color={dir2Color}
-        />
-
-        <directionalLight
-          position={[dir3PosX, dir3PosY, dir3PosZ]}
-          intensity={dir3Intensity}
-          color={dir3Color}
-        />
-
-        <pointLight
-          position={[pointPosX, pointPosY, pointPosZ]}
-          intensity={pointIntensity}
-          color={pointColor}
-        />
-
-        <Scene
-          position={[posX as number, posY as number, posZ as number]}
-          scale={scale}
-          rotation={[rotX, rotY, rotZ]}
-          position2={[posX2 as number, posY2 as number, posZ2 as number]}
-          scale2={scale2}
-          rotation2={[rotX2, rotY2, rotZ2]}
+        <Transition
+          scene1={
+            <>
+              {lights}
+              {ibl}
+              <Scene1
+                scale={scale}
+                position={[posX as number, posY as number, posZ as number]}
+                rotation={[rotX, rotY, rotZ]}
+              />
+            </>
+          }
+          scene2={
+            <>
+              {lights}
+              {ibl}
+              <Scene2
+                scale={scale2}
+                position={[
+                  posX2 as number,
+                  posY2 as number,
+                  posZ2 as number,
+                ]}
+                rotation={[rotX2, rotY2, rotZ2]}
+              />
+            </>
+          }
         />
       </Canvas>
     </>

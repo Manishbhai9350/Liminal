@@ -35,10 +35,10 @@ export function Hand2(props: React.ComponentProps<'group'>) {
     attenuationDistance,
   } = useControls("Hand2 Material", {
     color: { value: "#cc0a0a" },               
-    metalness: { value: 0.7, min: 0, max: 1, step: 0.01 },
-    roughness: { value: 0.2, min: 0, max: 1, step: 0.01 }, 
+    metalness: { value: 0.76, min: 0, max: 1, step: 0.01 },
+    roughness: { value: 0.70, min: 0, max: 1, step: 0.01 }, 
     clearcoat: { value: 1.0, min: 0, max: 1, step: 0.01 },
-    clearcoatRoughness: { value: 0.04, min: 0, max: 1, step: 0.01 },
+    clearcoatRoughness: { value: 0.5, min: 0, max: 1, step: 0.01 },
     reflectivity: { value: 1.0, min: 0, max: 1, step: 0.01 },
     envMapIntensity: { value: 2.2, min: 0, max: 10, step: 0.1 },
     specularIntensity: { value: 1.2, min: 0, max: 5, step: 0.01 },

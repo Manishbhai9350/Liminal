@@ -11,6 +11,8 @@ import {
 } from "./shaders/shader";
 import { shaderMaterial } from "@react-three/drei";
 import { extend, useFrame, useThree } from "@react-three/fiber";
+import { useScroll } from "../../components/scroll/useScroll";
+import Lenis from "lenis";
 
 interface TransitionProps {
   bg1: Texture<unknown>;
@@ -78,7 +80,7 @@ const TransitionMaterial = ({ bg1, bg2 }: TransitionProps) => {
     progress: {
       value: 0,
       min: 0,
-      max: 1,
+      max: 1.2,
       step: 0.001,
     },
   });
@@ -90,12 +92,39 @@ const TransitionMaterial = ({ bg1, bg2 }: TransitionProps) => {
     ref.current.tScene1 = bg1;
     ref.current.tScene2 = bg2;
 
-    // optional (can be same as bg1 for now)
     ref.current.tSection = bg2;
-    ref.current.tTechNoise = bg1; // better if you load a noise texture later
+    ref.current.tTechNoise = bg1;
   }, [bg1, bg2]);
 
   // update every frame
+
+
+const scroller = useScroll()
+const scrollProg = useRef(0);
+
+// No console.log or direct ref access during render
+
+useEffect(() => {
+  const handleUpdate = (data: { progress: number; current: number; target: number }) => {
+    scrollProg.current = data.progress + 0.3;
+    // Try using document.body.classList for background switching
+    const body = document.body;
+    if (body) {
+      if (data.progress > 0.5) {
+        body.classList.add('bg2');
+        body.classList.remove('bg1');
+      } else {
+        body.classList.add('bg1');
+        body.classList.remove('bg2');
+      }
+    }
+  };
+  scroller.on("update", handleUpdate);
+  return () => {
+    scroller.off("update", handleUpdate);
+  };
+}, [scroller]);
+
   useFrame((state) => {
     if (!ref.current) return;
 
@@ -106,7 +135,7 @@ const TransitionMaterial = ({ bg1, bg2 }: TransitionProps) => {
 
     ref.current.uResolution.set(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio);
 
-    ref.current.uProgress = progress;
+    ref.current.uProgress = scrollProg.current;
 
     // optional animations
     ref.current.uWaveSize = 1.0;
@@ -114,7 +143,7 @@ const TransitionMaterial = ({ bg1, bg2 }: TransitionProps) => {
     ref.current.uWaveGlow = 0.3;
   });
 
-  return <tMat ref={ref} />;
+  return <tMat transparent ref={ref} />;
 };
 
 export default TransitionMaterial;
