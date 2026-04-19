@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import { DATA } from "../config/data";
 import Content from "./content";
-import { setDomOverflow } from "../utils";
 import { useScroll } from "./scroll/useScroll";
 
 const UI = () => {

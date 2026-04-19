@@ -1,12 +1,8 @@
-// ScrollEngine.ts
-
 type ScrollEvents = {
   update: { progress: number; current: number; target: number };
 };
 
 type Callback<T> = (data: T) => void;
-
-// ScrollEngine.ts
 
 export class ScrollEngine {
   private current = 0;
@@ -15,12 +11,17 @@ export class ScrollEngine {
   private lerp = 0.08;
   private paused = false;
 
+  private rafId: number | null = null;
+
   private events: {
     [K in keyof ScrollEvents]?: Callback<ScrollEvents[K]>[];
   } = {};
 
-  constructor(options?: { paused?: boolean }) {
+  constructor(options?: { paused?: boolean; max?: number; lerp?: number }) {
     this.paused = options?.paused ?? false;
+    if (options?.max) this.max = options.max;
+    if (options?.lerp) this.lerp = options.lerp;
+
     this.init();
   }
 
@@ -31,18 +32,41 @@ export class ScrollEngine {
   }
 
   off<K extends keyof ScrollEvents>(event: K, cb: Callback<ScrollEvents[K]>) {
-    this.events[event] = this.events[event]?.filter((fn) => fn !== cb) || [];
+    this.events[event] =
+      this.events[event]?.filter((fn) => fn !== cb) || [];
   }
 
-  private emit<K extends keyof ScrollEvents>(event: K, data: ScrollEvents[K]) {
+  private emit<K extends keyof ScrollEvents>(
+    event: K,
+    data: ScrollEvents[K]
+  ) {
     this.events[event]?.forEach((cb) => cb(data));
+  }
+
+  // 🔁 Wrap value (infinite scroll)
+  private wrap(v: number) {
+    const range = this.max;
+    return ((v % range) + range) % range;
+  }
+
+  // 🧠 Circular lerp (shortest path)
+  private circularLerp(current: number, target: number, ease: number) {
+    const range = this.max;
+
+    let delta = target - current;
+
+    if (delta > range / 2) delta -= range;
+    if (delta < -range / 2) delta += range;
+
+    return current + delta * ease;
   }
 
   // 🎯 Input
   private handleWheel = (e: WheelEvent) => {
-    const delta = Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY), 60);
+    const delta =
+      Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY), 60);
 
-    this.target = this.clamp(this.target + delta);
+    this.target = this.wrap(this.target + delta);
   };
 
   private lastY = 0;
@@ -56,17 +80,20 @@ export class ScrollEngine {
     const delta = this.lastY - y;
     this.lastY = y;
 
-    this.target = this.clamp(this.target + delta * 2);
+    this.target = this.wrap(this.target + delta * 2);
   };
-
-  private clamp(v: number) {
-    return Math.max(0, Math.min(v, this.max));
-  }
 
   // 🚀 Engine loop
   private loop = () => {
     if (!this.paused) {
-      this.current += (this.target - this.current) * this.lerp;
+      this.current = this.circularLerp(
+        this.current,
+        this.target,
+        this.lerp
+      );
+
+      // keep current inside range
+      this.current = this.wrap(this.current);
     }
 
     const progress = this.current / this.max;
@@ -91,6 +118,8 @@ export class ScrollEngine {
 
   setMax(v: number) {
     this.max = v;
+    this.current = this.wrap(this.current);
+    this.target = this.wrap(this.target);
   }
 
   destroy() {

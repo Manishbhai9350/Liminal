@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
+import { useEffect, useRef, type Dispatch, type SetStateAction } from "react";
 import type { DataType } from "../config/data";
 import { useGSAP } from "@gsap/react";
 import { SplitIt } from "../utils";
@@ -17,6 +11,10 @@ interface ContentProps extends DataType {
   setLoaded: Dispatch<SetStateAction<boolean>>;
   loaded: boolean;
 }
+
+const getProg = (p: number, startProg: number, endProg: number) =>
+  Math.min(Math.max(p - startProg, 0), endProg - startProg) /
+  (endProg - startProg);
 
 const Content = ({
   heading,
@@ -34,9 +32,9 @@ const Content = ({
   const DescriptionRef = useRef(null);
   const SysRef = useRef(null);
   const ScrollCueRef = useRef(null);
-  const ProgressBarRef = useRef(null);
-  const ProgressStatusRef = useRef(null);
-  const ProgressBarParentRef = useRef(null);
+  const ProgressBarRef = useRef<HTMLDivElement>(null);
+  const ProgressStatusRef = useRef<HTMLDivElement>(null);
+  const ProgressBarParentRef = useRef<HTMLDivElement>(null);
   const ProgressRef = useRef(0);
   const HasInitialLoaded = useRef(false);
   const TimelineRef = useRef<gsap.core.Timeline | null>(null);
@@ -49,41 +47,67 @@ const Content = ({
     const update = ({ progress }: { progress: number }) => {
       ProgressRef.current = progress;
 
+      if (ProgressStatusRef.current) {
+        const percent = Math.floor(progress * 100)
+          .toString()
+          .padStart(2, "0");
+        ProgressStatusRef.current.innerHTML = `${percent}%`;
+        gsap.set(ProgressBarRef.current, { scaleX: progress });
+      }
+
+      const p = progress;
+      const C = SCENE_CONFIG;
+
       if (scene === "sceneA") {
-        if (ProgressStatusRef.current) {
-          const percent = Math.floor(progress * 100)
-            .toString()
-            .padStart(2, "0");
-
-          ProgressStatusRef.current!.innerHTML = `${percent}%`;
-
-          gsap.set(ProgressBarRef.current, {
-            scaleX: progress,
-          });
-        }
-
         if (TimelineRef.current) {
-          const p = progress;
-          const startProg = SCENE_CONFIG.sceneA.startProg;
-          const endProg = SCENE_CONFIG.sceneA.endProg;
-          const prog =
-            Math.min(Math.max(p - startProg, 0), endProg - startProg) /
-            (endProg - startProg);
-          TimelineRef.current.progress(1 - prog);
+          if (p <= C.sceneA_fadeOut.endProg) {
+            // Actively in fade out phase
+            const prog = getProg(
+              p,
+              C.sceneA_fadeOut.startProg,
+              C.sceneA_fadeOut.endProg,
+            );
+            TimelineRef.current.progress(1 - prog);
+          } else if (p >= C.sceneA_fadeIn.startProg) {
+            // Actively in fade in phase
+            const prog = getProg(
+              p,
+              C.sceneA_fadeIn.startProg,
+              C.sceneA_fadeIn.endProg,
+            );
+            TimelineRef.current.progress(prog);
+          } else {
+            // In between (transition zone) — lock to fully faded out
+            TimelineRef.current.progress(0);
+          }
         }
       }
 
-      if (scene == "sceneB" && TimelineRef.current) {
-        const p = progress;
-        const startProg = SCENE_CONFIG.sceneB.startProg;
-        const endProg = SCENE_CONFIG.sceneB.endProg;
-        const prog =
-          Math.min(Math.max(p - startProg, 0), endProg - startProg) /
-          (endProg - startProg);
-        TimelineRef.current.progress(prog);
+      if (scene === "sceneB") {
+        if (TimelineRef.current) {
+          if (p <= C.sceneB_fadeIn.endProg) {
+            // Actively in fade in phase
+            const prog = getProg(
+              p,
+              C.sceneB_fadeIn.startProg,
+              C.sceneB_fadeIn.endProg,
+            );
+            TimelineRef.current.progress(prog);
+          } else if (p >= C.sceneB_fadeOut.startProg) {
+            // Actively in fade out phase
+            const prog = getProg(
+              p,
+              C.sceneB_fadeOut.startProg,
+              C.sceneB_fadeOut.endProg,
+            );
+            TimelineRef.current.progress(1 - prog);
+          } else {
+            // Hold zone (0.4 → 0.6) — lock to fully visible
+            TimelineRef.current.progress(1);
+          }
+        }
       }
     };
-
     scroller.on("update", update);
 
     return () => {

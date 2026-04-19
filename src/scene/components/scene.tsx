@@ -2,7 +2,8 @@ import { useThree } from "@react-three/fiber";
 import { Hand } from "../../components/models/Hand";
 import { Hand2 } from "../../components/models/Hand2";
 import { SceneBounds } from "../../utils/three.utils";
-import type { PerspectiveCamera } from "three";
+import { SRGBColorSpace, type PerspectiveCamera } from "three";
+import { useTexture } from "@react-three/drei";
 
 export type SceneModelProps = {
   scale: number;
@@ -21,11 +22,14 @@ export const Scene1 = ({ scale, position, rotation }: SceneModelProps) => {
     fov: camera.fov
   })
 
+  const [bg] = useTexture(['/Design/bg.jpeg'])
+  bg.colorSpace = SRGBColorSpace;
+
   return (
     <>
       <mesh position={[0,0,-BG_Z]}>
         <planeGeometry args={[width,height]} />
-        <meshBasicMaterial color={'red'} />
+        <meshBasicMaterial map={bg} />
       </mesh>
       <Hand
         scale={scale}

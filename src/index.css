@@ -12,9 +12,9 @@ body {
   width: 100%;
   height: 100vh !important;
  }
-/* body {
+body {
   background: url("/Design/bg2.jpeg") center center / cover no-repeat;
-}  */
+} 
 
 /* .bg1{
   background: url("/Design/bg2.jpeg") center center / cover no-repeat;
@@ -119,7 +119,7 @@ main.app {
         opacity: 70%;
         font-size: 1rem;
         font-weight: 300;
-        line-height: 120%;
+        line-height: 130%;
         letter-spacing: -2%;
       }
     }

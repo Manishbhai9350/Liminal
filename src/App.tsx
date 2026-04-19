@@ -11,11 +11,11 @@ const App = () => {
   const path = useRoute();
   if (path === "/") {
     return (
-      <ScrollProvider paused={true} max={innerHeight * 10}>
+      <ScrollProvider paused={true} max={innerHeight * 25}>
         <div className="bg"></div>
         <main className="app">
           <UI />
-          <Experience />
+          {/* <Experience /> */}
         </main>
       </ScrollProvider>
     );
