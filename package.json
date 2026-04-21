@@ -21,6 +21,7 @@
     "three": "^0.183.2",
     "three-stdlib": "^2.36.1",
     "tsl": "^1.0.30",
+    "vite-plugin-glsl": "^1.6.0",
     "webgpu": "^0.4.0"
   },
   "devDependencies": {

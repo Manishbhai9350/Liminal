@@ -14,8 +14,8 @@ const App = () => {
       <ScrollProvider paused={true} max={innerHeight * 25}>
         <div className="bg"></div>
         <main className="app">
-          <UI />
-          {/* <Experience /> */}
+          {/* <UI /> */}
+          <Experience />
         </main>
       </ScrollProvider>
     );

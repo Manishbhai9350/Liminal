@@ -98,32 +98,35 @@ const TransitionMaterial = ({ bg1, bg2 }: TransitionProps) => {
 
   // update every frame
 
+  const scroller = useScroll();
+  const scrollProg = useRef(0);
 
-const scroller = useScroll()
-const scrollProg = useRef(0);
+  // No console.log or direct ref access during render
 
-// No console.log or direct ref access during render
-
-useEffect(() => {
-  const handleUpdate = (data: { progress: number; current: number; target: number }) => {
-    scrollProg.current = data.progress + 0.3;
-    // Try using document.body.classList for background switching
-    const body = document.body;
-    if (body) {
-      if (data.progress > 0.5) {
-        body.classList.add('bg2');
-        body.classList.remove('bg1');
-      } else {
-        body.classList.add('bg1');
-        body.classList.remove('bg2');
+  useEffect(() => {
+    const handleUpdate = (data: {
+      progress: number;
+      current: number;
+      target: number;
+    }) => {
+      scrollProg.current = data.progress + 0.3;
+      // Try using document.body.classList for background switching
+      const body = document.body;
+      if (body) {
+        if (data.progress > 0.5) {
+          body.classList.add("bg2");
+          body.classList.remove("bg1");
+        } else {
+          body.classList.add("bg1");
+          body.classList.remove("bg2");
+        }
       }
-    }
-  };
-  scroller.on("update", handleUpdate);
-  return () => {
-    scroller.off("update", handleUpdate);
-  };
-}, [scroller]);
+    };
+    scroller.on("update", handleUpdate);
+    return () => {
+      scroller.off("update", handleUpdate);
+    };
+  }, [scroller]);
 
   useFrame((state) => {
     if (!ref.current) return;
@@ -133,7 +136,10 @@ useEffect(() => {
     //             i = window.innerWidth * n,
     //             a = window.innerHeight * n;
 
-    ref.current.uResolution.set(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio);
+    ref.current.uResolution.set(
+      window.innerWidth * window.devicePixelRatio,
+      window.innerHeight * window.devicePixelRatio,
+    );
 
     ref.current.uProgress = scrollProg.current;
 
