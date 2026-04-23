@@ -30,7 +30,7 @@ const Gradient = () => {
     uSpeed:{
       value:1,
       min:0,
-      max:1,
+      max:100,
       step:.01
     },
     uFreq:{
