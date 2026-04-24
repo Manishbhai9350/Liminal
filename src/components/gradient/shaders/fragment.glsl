@@ -1,99 +1,133 @@
-// Cosmic blue gradient with organic dark blobs
-// Recreates a deep blue → cyan flow with soft black "voids"
-
+// SPDX-License-Identifier: CC0-1.0
 varying vec2 vUv;
+
 uniform float uTime;
-uniform float uScale;
-uniform float uFreq;
-uniform float uSpeed;
-uniform vec2 uResolution;
+uniform float uFreq;     
+uniform float uScale;    
+uniform float uSpeed;    
+uniform float uContrast; 
 
-// ---------- Hash / Noise ----------
-vec2 hash2(vec2 p) {
-    p = vec2(dot(p, vec2(127.1, 311.7)),
-             dot(p, vec2(269.5, 183.3)));
-    return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
+vec3 ColorA = vec3(0.11, 0.28, 0.86);
+vec3 ColorB = vec3(0.0);
+
+// --------------------------------------------------
+// COLOR SPACE
+// --------------------------------------------------
+vec3 fromLinear(vec3 linearRGB)
+{
+    bvec3 cutoff = lessThan(linearRGB.rgb, vec3(0.0031308));
+    vec3 higher = vec3(1.055)*pow(linearRGB.rgb, vec3(1.0/2.4)) - vec3(0.055);
+    vec3 lower = linearRGB.rgb * vec3(12.92);
+    return mix(higher, lower, cutoff);
 }
 
-// 2D gradient noise
-float noise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-    vec2 u = f * f * (3.0 - 2.0 * f);
-
-    return mix(mix(dot(hash2(i + vec2(0.0, 0.0)), f - vec2(0.0, 0.0)),
-                   dot(hash2(i + vec2(1.0, 0.0)), f - vec2(1.0, 0.0)), u.x),
-               mix(dot(hash2(i + vec2(0.0, 1.0)), f - vec2(0.0, 1.0)),
-                   dot(hash2(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0)), u.x), u.y);
+vec3 toLinear(vec3 sRGB)
+{
+    bvec3 cutoff = lessThan(sRGB.rgb, vec3(0.04045));
+    vec3 higher = pow((sRGB.rgb + vec3(0.055))/vec3(1.055), vec3(2.4));
+    vec3 lower = sRGB.rgb/vec3(12.92);
+    return mix(higher, lower, cutoff);
 }
 
-// Fractal Brownian Motion for soft, organic flow
-float fbm(vec2 p) {
-    float v = 0.0;
-    float a = 0.5;
-    for (int i = 0; i < 5; i++) {
-        v += a * noise(p);
-        p *= 2.0;
-        a *= 0.5;
+vec4 safeQuatMix(vec4 a, vec4 b, float t)
+{
+    // If quaternions point opposite, flip one
+    if(dot(a,b) < 0.0) b = -b;
+
+    // Normalize after mix for safety
+    return normalize(mix(a,b,t));
+}
+
+// --------------------------------------------------
+// UV → SPHERE SPACE
+// --------------------------------------------------
+vec3 uv_to_cartesian3d(vec2 uv)
+{
+    float theta = uv.x * 6.28318530718;
+    float phi = uv.y * 3.14159265359;
+    return vec3(
+        sin(phi) * cos(theta),
+        sin(phi) * sin(theta),
+        cos(phi)
+    );
+}
+
+// --------------------------------------------------
+// RANDOM + QUATERNIONS
+// --------------------------------------------------
+float hash(float n) { return fract(sin(n) * 43758.5453123); }
+
+vec4 randomQuaternion(float seed) {
+    float u1 = hash(seed + 0.0);
+    float u2 = hash(seed + 1.0);
+    float u3 = hash(seed + 2.0);
+
+    float sqrt1_u1 = sqrt(1.0 - u1);
+    float sqrt_u1  = sqrt(u1);
+
+    float theta1 = 6.28318530718 * u2;
+    float theta2 = 6.28318530718 * u3;
+
+    return vec4(
+        sqrt1_u1 * sin(theta1),
+        sqrt1_u1 * cos(theta1),
+        sqrt_u1  * sin(theta2),
+        sqrt_u1  * cos(theta2)
+    );
+}
+
+vec3 rotateVecByQuat(vec3 v, vec4 q) {
+    return v + 2.0 * cross(q.xyz, cross(q.xyz, v) + q.w * v);
+}
+
+float distanceToPlane(vec3 p, vec4 q) {
+    vec3 n = rotateVecByQuat(vec3(0.0,0.0,1.0), q);
+    return dot(p, n);
+}
+
+// --------------------------------------------------
+// MAIN
+// --------------------------------------------------
+void main()
+{
+    // 1️⃣ UV scaling (zoom control)
+    vec2 uv = (vUv - 0.5) * uScale + 0.5;
+    vec3 pos = uv_to_cartesian3d(uv * uFreq);
+
+    // 2️⃣ Speed controlled time
+    float time = uTime * uSpeed / 10.0;
+
+    // 3️⃣ Multiple rotating planes
+    float accum = 0.0;
+    float total = 0.0;
+
+    for(int i=0; i<32; i++)
+    {
+        if(float(i) >= uFreq) break;
+
+        float seed = float(i) * 10.0;
+        float t = time + seed;
+
+        vec4 q1 = randomQuaternion(floor(t));
+        vec4 q2 = randomQuaternion(floor(t+1.0));
+        vec4 quat = safeQuatMix(q1, q2, fract(t));
+
+        float d = distanceToPlane(pos, quat);
+        float g = d * 0.5 + 0.5; // -1..1 → 0..1
+
+        accum += g;
+        total += 1.0;
     }
-    return v;
-}
 
-void main() {
-    // Aspect-corrected UVs centered at 0
-    vec2 uv = vUv;
-    vec2 p  = (uv - 0.5);
-    p.x *= uResolution.x / uResolution.y;
+    float gradient = accum / total;
 
-    float t = uTime * uSpeed;
+    // 4️⃣ Contrast control
+    gradient = pow(gradient, uContrast);
+    gradient = smoothstep(0.0, 1.0, gradient);
 
-    // ---------- Domain warping for organic blob shapes ----------
-    vec2 q = vec2(
-        fbm(p * uScale + vec2(0.0, 0.0) + t * 0.15),
-        fbm(p * uScale + vec2(5.2, 1.3) - t * 0.12)
-    );
+    // 5️⃣ Final color (linear workflow)
+    // vec3 color = mix(toLinear(ColorA), toLinear(ColorB), gradient);
+    vec3 color = mix(ColorA, ColorB, gradient);
 
-    vec2 r = vec2(
-        fbm(p * uScale + q * uFreq + vec2(1.7, 9.2) + t * 0.20),
-        fbm(p * uScale + q * uFreq + vec2(8.3, 2.8) - t * 0.18)
-    );
-
-    float n = fbm(p * uScale + r * uFreq);
-    n = smoothstep(-0.2, 1.0, n); // lift midtones
-
-    // ---------- Color palette (deep blue → electric cyan) ----------
-    vec3 cBlack = vec3(0.000, 0.000, 0.012);   // deep void
-    vec3 cNavy  = vec3(0.004, 0.020, 0.250);   // dark blue
-    vec3 cBlue  = vec3(0.020, 0.180, 0.980);   // pure blue
-    vec3 cAzure = vec3(0.000, 0.560, 1.000);   // bright azure
-    vec3 cCyan  = vec3(0.000, 0.900, 1.000);   // electric cyan
-
-    // Vertical lift — top is brighter / cyan, like the reference
-    float vert = smoothstep(0.0, 1.0, 1.0 - uv.y);
-
-    // Build gradient
-    vec3 col = cBlack;
-    col = mix(col, cNavy,  smoothstep(0.05, 0.35, n));
-    col = mix(col, cBlue,  smoothstep(0.30, 0.65, n));
-    col = mix(col, cAzure, smoothstep(0.55, 0.85, n + vert * 0.25));
-    col = mix(col, cCyan,  smoothstep(0.75, 1.05, n + vert * 0.45));
-
-    // ---------- Dark "voids" — soft black blobs ----------
-    float voids = smoothstep(0.55, 0.0, fbm(p * uScale * 0.6 + vec2(-t * 0.08, t * 0.05)));
-    col = mix(col, cBlack, voids * 0.85);
-
-    // Subtle vignette to deepen edges
-    float vig = smoothstep(1.2, 0.2, length(p));
-    col *= mix(0.6, 1.0, vig);
-
-    // Gentle highlight bloom near top
-    col += cCyan * pow(vert, 3.0) * 0.15;
-
-    // Film-grain-ish dithering to avoid banding
-    float grain = (fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) / 255.0;
-    col += grain;
-
-    col *= 10.0;
-
-    gl_FragColor = vec4(col, 1.0);
+    gl_FragColor = vec4(color, 1.0);
 }

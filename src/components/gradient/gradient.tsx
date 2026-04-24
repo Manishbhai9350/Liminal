@@ -14,6 +14,7 @@ const GradientMaterial = shaderMaterial(
     uResolution: new THREE.Vector2(0,0),
     uSpeed: 0,
     uScale: 1,
+    uContrast: 2,
     uFreq: 1
   },
   GradientVertex,
@@ -26,23 +27,28 @@ const Gradient = () => {
   const MatRef = useRef();
 
 
-  const { uFreq, uScale, uSpeed } = useControls({
+  const { uFreq, uScale, uSpeed,uContrast  } = useControls({
     uSpeed:{
-      value:1,
+      value:6,
       min:0,
       max:100,
       step:.01
     },
     uFreq:{
-      value:10,
+      value:8,
       min:0,
       max:100
     },
     uScale:{
-      value:1,
+      value:2,
       min:0,
       max:100
-    }
+    },
+    uContrast:{
+      value:.8,
+      min:0,
+      max:10
+    },
   })
 
   useEffect(() => {
@@ -52,11 +58,12 @@ const Gradient = () => {
     MatRef.current.uSpeed = uSpeed
     MatRef.current.uFreq = uFreq
     MatRef.current.uScale = uScale
+    MatRef.current.uContrast = uContrast
   
     return () => {
       
     }
-  }, [])
+  }, [uSpeed,uFreq,uScale,uContrast])
   
 
   const camera = useThree((v) => v.camera as PerspectiveCamera);
