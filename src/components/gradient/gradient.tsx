@@ -12,21 +12,23 @@ const GradientMaterial = shaderMaterial(
   {
     uTime: 0,
     uResolution: new THREE.Vector2(0,0),
-    uSpeed: 0,
+    uSpeed: 2,
     uScale: 1,
     uContrast: 2,
     uFreq: 1,
     uAmp: .1,
-    uCurveOff: .1
+    uCurveOff: .1,
+    uMouse: new THREE.Vector2(0,0) // 👈 NEW
   },
   GradientVertex,
   GradientFragment,
 );
-
 extend({ GradientMaterial })
 
 const Gradient = () => {
   const MatRef = useRef();
+
+  const mouse = useThree((state) => state.mouse);
 
 
   const { uFreq, uScale, uSpeed,uContrast, uCurveAmp, uCurveOff  } = useControls({
@@ -43,7 +45,7 @@ const Gradient = () => {
       step:.001
     },
     uSpeed:{
-      value:6,
+      value:2,
       min:0,
       max:100,
       step:.01
@@ -62,7 +64,7 @@ const Gradient = () => {
       value:.8,
       min:0,
       max:10
-    },
+    }
   })
 
   useEffect(() => {
@@ -95,13 +97,16 @@ const Gradient = () => {
   const [bg] = useTexture(["/Design/bg.jpeg"]);
   bg.colorSpace = THREE.SRGBColorSpace;
 
-  useFrame(({ clock }) => {
-    if(!MatRef.current) return;
+ const Mouse = useThree((state) => state.mouse);
 
-    MatRef.current.uTime = clock.getElapsedTime();
-    
-    
-  })
+useFrame(({ clock }) => {
+  if (!MatRef.current) return;
+
+  MatRef.current.uTime = clock.getElapsedTime();
+
+  // pass normalized mouse
+  MatRef.current.uMouse.set(Mouse.x, Mouse.y);
+});
 
   return <>
   <OrbitControls makeDefault />
