@@ -9,10 +9,21 @@ uniform float uContrast;
 uniform float uCurveAmp;
 uniform float uCurveOff;
 uniform vec2 uMouse;
+uniform float uFractSoftness;
+uniform float uFractStrips;
+uniform float uFractStrength;
+uniform vec3 uColorA;
+uniform vec3 uColorB;
 
-vec3 ColorR = vec3(0.0, 0.54, 0.64);
-vec3 ColorA = vec3(0.11, 0.28, 0.86);
-vec3 ColorB = vec3(0.0);
+const float NUM_STRIPES = 25.0;
+const float STRRENGTH = 1.0;
+const float SOFTNESS = 0.0005;
+
+
+// vec3 ColorR = vec3(0.0, 0.54, 0.64);
+// vec3 ColorA = vec3(0.11, 0.28, 0.86);
+// vec3 ColorA = vec3(0.86, 0.11, 0.11);
+// vec3 ColorB = vec3(0.0);
 
 vec3 mod289(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -147,6 +158,59 @@ float distanceToPlane(vec3 p, vec4 q) {
     return dot(p, n);
 }
 
+float fractalGlass(vec2 uv, float scale) {
+    // repeat space
+    float x = uv.x * scale;
+    float f = fract(x);
+
+    // distance to band center
+    float d = abs(f - 0.5);
+
+    // gaussian falloff → smooth glass highlight
+    float band = exp(-20.0 * d * d);
+
+    // add subtle micro variation so it feels organic
+    float x2 = uv.x * scale * 0.5/*  + uv.y * 2.0 */;
+    float f2 = fract(x2);
+    float d2 = abs(f2 - 0.5);
+    float band2 = exp(-15.0 * d2 * d2);
+
+    return band * 0.7 + band2 * 0.3;
+}
+
+float cornerMask(vec2 uv) {
+    float left = step(uv.x, 0.5);
+    float right = step(0.5, uv.x);
+    float bottom = step(uv.y, 0.5);
+    float top = step(0.5, uv.y);
+
+    float bottomLeft = left * bottom;
+    float topRight = right * top;
+
+    return bottomLeft + topRight;
+}
+
+
+float displacement(float x, float num_stripes, float strength) {
+
+    float modulus = 1.0 / num_stripes;
+    
+    return mod(x, modulus) * strength;
+}
+
+float fractal_glass(float x) {
+
+    float d = 0.0;
+    for (int i = -5; i <= 5; i++) {
+       d += displacement(x + float(i) * uFractSoftness / 1000.0, uFractStrips, uFractStrength);
+    }
+
+    d = d / 11.0;
+    
+    return x + d;
+}
+
+
 // --------------------------------------------------
 // MAIN
 // --------------------------------------------------
@@ -198,19 +262,18 @@ void main() {
     // color = vec3(gradient);
 
     vec2 uv = vUv;
+    // uv.x = fractal_glass(uv.x);
     vec3 color = vec3(0.0);
     // vec2 mouse = vec2(sin(uTime),cos(uTime)) * .5 + .5;
-    float fractal = 1.0 - fract(vUv.x * 10.0);
 
-    vec2 minBox = vec2(0.25);
-    vec2 maxBox = vec2(0.75);
+    // glass intensity
+    // float fractal = fractalGlass(uv, 10.0);
 
-    bool outsideBox = vUv.x < minBox.x || vUv.x > maxBox.x ||
-        vUv.y < minBox.y || vUv.y > maxBox.y;
+    // where effect should appear
+    // float mask = cornerMask(uv);
 
-    if(outsideBox) {
-        uv += fractal * 0.5;
-    }
+    // apply distortion
+    // uv += fractal * 0.5;
 
     float noised = pnoise(vec3((uv - uMouse * .05) * uFreq * .1, uTime * .1 * uSpeed));
     float n2 = pnoise(vec3((vec2(100.0) + uv) * uFreq * .1, uTime * .1 * uSpeed));
@@ -218,11 +281,7 @@ void main() {
 
     color = vec3(n3);
 
-    color = mix(ColorB, ColorA, abs(noised + n2));
-    color = mix(color, ColorR, n3 * .1);
-    // color = mix(ColorB,ColorA,1.0);
-
-    // color = vec3(uv,0.0);
+    color = mix(uColorB, uColorA, abs(noised + n2));
 
     gl_FragColor = vec4(color, 1.0);
 }

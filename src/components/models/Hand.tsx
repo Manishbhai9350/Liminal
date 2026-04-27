@@ -17,7 +17,7 @@ type GLTFResult = GLTF & {
 export function Hand(props: React.ComponentProps<'group'>) {
   const { nodes } = useGLTF('/models/arm2.glb') as unknown as GLTFResult
 
-  const [env] = useTexture(['/env.jpg'])
+  // const [env] = useTexture(['/env.jpg'])
 
   const {
     color,
@@ -59,8 +59,9 @@ export function Hand(props: React.ComponentProps<'group'>) {
         // material={nodes.Point_Std_Skin_Arm_0.material}
       >
         <meshPhysicalMaterial
-              envMap={env}
+              // envMap={env}
               // color={color}
+              color={'blue'}
               metalness={metalness}
               roughness={roughness}
               // clearcoat={clearcoat}
