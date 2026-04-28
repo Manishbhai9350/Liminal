@@ -24,6 +24,7 @@ const GradientMaterial = shaderMaterial(
     uFractStrips: 18,
     uColorA: null,
     uColorB: null,
+    uPerlin: null,
   },
   GradientVertex,
   GradientFragment,
@@ -31,6 +32,9 @@ const GradientMaterial = shaderMaterial(
 extend({ GradientMaterial });
 
 const Gradient = ({ colorA, colorB }: { colorA: string; colorB: string }) => {
+  const perlinTexture = useTexture("/textures/perlin.png");
+  perlinTexture.wrapS = perlinTexture.wrapT = THREE.RepeatWrapping;
+
   const MatRef = useRef();
 
   const mouse = useThree((state) => state.mouse);
@@ -112,6 +116,7 @@ const Gradient = ({ colorA, colorB }: { colorA: string; colorB: string }) => {
     MatRef.current.uFractStrips = uFractStrips;
     MatRef.current.uColorA = new THREE.Color(colorA);
     MatRef.current.uColorB = new THREE.Color(colorB);
+    MatRef.current.uPerlin = perlinTexture;
 
     return () => {};
   }, [
@@ -125,7 +130,8 @@ const Gradient = ({ colorA, colorB }: { colorA: string; colorB: string }) => {
     uFractSoftness,
     uFractStrips,
     colorA,
-    colorB
+    colorB,
+    perlinTexture,
   ]);
 
   const camera = useThree((v) => v.camera as PerspectiveCamera);
