@@ -20,7 +20,6 @@ const float NUM_STRIPES = 25.0;
 const float STRRENGTH = 1.0;
 const float SOFTNESS = 0.0005;
 
-
 // vec3 ColorR = vec3(0.0, 0.54, 0.64);
 // vec3 ColorA = vec3(0.11, 0.28, 0.86);
 // vec3 ColorA = vec3(0.86, 0.11, 0.11);
@@ -111,7 +110,7 @@ float pnoise(vec3 p) {
     vec2 uv = p.xy;
     uv += p.z;
 
-    float noise = texture(uPerlin,uv);
+    float noise = texture(uPerlin, uv);
 
     return noise;
 }
@@ -200,26 +199,24 @@ float cornerMask(vec2 uv) {
     return bottomLeft + topRight;
 }
 
-
 float displacement(float x, float num_stripes, float strength) {
 
     float modulus = 1.0 / num_stripes;
-    
+
     return mod(x, modulus) * strength;
 }
 
 float fractal_glass(float x) {
 
     float d = 0.0;
-    for (int i = -5; i <= 5; i++) {
-       d += displacement(x + float(i) * uFractSoftness / 1000.0, uFractStrips, uFractStrength);
+    for(int i = -5; i <= 5; i++) {
+        d += displacement(x + float(i) * uFractSoftness / 1000.0, uFractStrips, uFractStrength);
     }
 
     d = d / 11.0;
-    
+
     return x + d;
 }
-
 
 // --------------------------------------------------
 // MAIN
