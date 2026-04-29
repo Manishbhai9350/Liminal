@@ -47,6 +47,8 @@ export function Hand2(props: React.ComponentProps<'group'>) {
     sheenColor: { value: "#8b0000" },            
     attenuationColor: { value: "#5a0000" },
     attenuationDistance: { value: 2, min: 0, max: 10, step: 0.01 },
+  },{
+    collapsed:true
   });
 
   return (

@@ -35,7 +35,7 @@ const Experience = () => {
     rotY: { value: 4.55, min: -Math.PI * 2, max: Math.PI * 2, step: 0.01 },
     rotZ: { value: 0, min: -Math.PI * 2, max: Math.PI * 2, step: 0.01 },
 
-    ColorA: "#1C47DB",
+    ColorA: "#233880",
     ColorB: "#DB1C1C",
 
     // 🔴 Model 2
@@ -56,6 +56,8 @@ const Experience = () => {
       step: 0.01,
     },
     rotZ2: { value: 0, min: -Math.PI * 2, max: Math.PI * 2, step: 0.01 },
+  }, {
+    collapsed:true
   });
   return (
     <>
@@ -70,7 +72,7 @@ const Experience = () => {
         <Stats />
         {/* <Gradient /> */}
         {/* {lights} */}
-        <Environment files="/neutral_HDR.jpg" background={false} />
+        <Environment environmentRotation={new THREE.Euler(Math.PI/3.77,0,0)} files="/neutral_HDR.jpg" background={false} />
         <CameraControls makeDefault />
         <HandScene
           variant="hand1"

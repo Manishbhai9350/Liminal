@@ -31,6 +31,8 @@ const TransitionScene = () => {
       max: 1,
       step: 0.001,
     },
+  },{
+    collapsed:true
   });
 
   // const [bg1, bg2] = useTexture(["Design/bg2.jpeg", "Design/bg.jpeg"]);

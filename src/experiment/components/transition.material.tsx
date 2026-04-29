@@ -83,6 +83,8 @@ const TransitionMaterial = ({ bg1, bg2 }: TransitionProps) => {
       max: 1.2,
       step: 0.001,
     },
+  },{
+    collapsed:true
   });
 
   // set textures once

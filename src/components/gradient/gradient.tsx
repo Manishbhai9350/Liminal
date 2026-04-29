@@ -25,6 +25,7 @@ const GradientMaterial = shaderMaterial(
     uColorA: null,
     uColorB: null,
     uPerlin: null,
+    uBG: null,
   },
   GradientVertex,
   GradientFragment,
@@ -32,8 +33,9 @@ const GradientMaterial = shaderMaterial(
 extend({ GradientMaterial });
 
 const Gradient = ({ colorA, colorB }: { colorA: string; colorB: string }) => {
-  const perlinTexture = useTexture("/textures/perlin.png");
+  const [perlinTexture,blueGrad] = useTexture(["/textures/perlin.png","/Design/bg.jpeg"]);
   perlinTexture.wrapS = perlinTexture.wrapT = THREE.RepeatWrapping;
+  blueGrad.wrapS = blueGrad.wrapT = THREE.RepeatWrapping;
 
   const MatRef = useRef();
 
@@ -63,15 +65,16 @@ const Gradient = ({ colorA, colorB }: { colorA: string; colorB: string }) => {
       step: 0.001,
     },
     uSpeed: {
-      value: 2,
+      value: 1,
       min: 0,
-      max: 100,
-      step: 0.01,
+      max: 5,
+      step: 0.0001,
     },
     uFreq: {
-      value: 6,
+      value: 1,
       min: 0,
-      max: 100,
+      max: 5,
+      step:.001
     },
     uScale: {
       value: 2,
@@ -117,6 +120,7 @@ const Gradient = ({ colorA, colorB }: { colorA: string; colorB: string }) => {
     MatRef.current.uColorA = new THREE.Color(colorA);
     MatRef.current.uColorB = new THREE.Color(colorB);
     MatRef.current.uPerlin = perlinTexture;
+    MatRef.current.uBG = blueGrad;
 
     return () => {};
   }, [
@@ -132,6 +136,7 @@ const Gradient = ({ colorA, colorB }: { colorA: string; colorB: string }) => {
     colorA,
     colorB,
     perlinTexture,
+    blueGrad
   ]);
 
   const camera = useThree((v) => v.camera as PerspectiveCamera);

@@ -15,6 +15,7 @@ uniform float uFractStrength;
 uniform vec3 uColorA;
 uniform vec3 uColorB;
 uniform sampler2D uPerlin;
+uniform sampler2D uBG;
 
 const float NUM_STRIPES = 25.0;
 const float STRRENGTH = 1.0;
@@ -106,13 +107,51 @@ vec3 fade(vec3 t) {
 //     return 2.2 * n_xyz;
 // }
 
+vec3 gradient(vec2 uv) {
+    // base uv
+    vec2 p = uv * .01;
+
+    // --- noise distortion ---
+    float n1 = texture(uPerlin, p * 1.5).r;
+    float n2 = texture(uPerlin, p * 3.0 + 10.0).r;
+
+    // combine noise
+    float n = mix(n1, n2, 0.5);
+
+    // distort vertically (important for gradient flow)
+    p.y += (n - 0.5) * 0.15;
+
+    // slight horizontal drift (very subtle)
+    p.x += (n - 0.5) * 0.05;
+
+    // --- multi-sample to break repetition ---
+    vec3 col1 = texture(uBG, p).rgb;
+    vec3 col2 = texture(uBG, p * 0.5 + 0.25).rgb;
+
+    vec3 color = mix(col1, col2, 0.5);
+
+    // --- vignette (depth focus) ---
+    float d = length(uv - 0.5);
+    float vignette = smoothstep(0.8, 0.2, d);
+
+    color *= vignette;
+
+    // --- subtle glow / lift ---
+    color += n * 0.03;
+
+    return color;
+}
+
 float pnoise(vec3 p) {
     vec2 uv = p.xy;
-    uv += p.z;
 
-    float noise = texture(uPerlin, uv);
+    float t = p.z * 0.1;
 
-    return noise;
+    float n1 = texture(uPerlin, uv + vec2(t, 0.0)).r;
+    float n2 = texture(uPerlin, uv + vec2(0.0, t)).r;
+    float m = texture(uPerlin, vec2(t)).r;
+
+    return pow(mix(n1, n2, m),4.0);
 }
 
 // --------------------------------------------------
@@ -290,5 +329,11 @@ void main() {
 
     color = mix(uColorB, uColorA, abs(noised + n2));
 
+    color = gradient(uv);
+
     gl_FragColor = vec4(color, 1.0);
+
+
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
 }
