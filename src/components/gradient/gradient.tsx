@@ -165,7 +165,7 @@ const Gradient = ({ colorA, colorB }: { colorA: string; colorB: string }) => {
 
   return (
     <>
-      <OrbitControls makeDefault />
+      {/* <OrbitControls makeDefault /> */}
       <mesh position={[0, 0, -BG_Z]}>
         <planeGeometry args={[width, height]} />
         {/* <meshNormalMaterial /> */}
