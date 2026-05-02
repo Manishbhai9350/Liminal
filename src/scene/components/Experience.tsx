@@ -3,6 +3,7 @@ import { CameraControls, Environment, Stats } from "@react-three/drei";
 import * as THREE from "three";
 import { Leva, useControls } from "leva";
 import HandScene from "./scene";
+import SceneEnv from "../../components/environment";
 
 const Experience = () => {
   const {
@@ -72,8 +73,9 @@ const Experience = () => {
         <Stats />
         {/* <Gradient /> */}
         {/* {lights} */}
-        <Environment environmentRotation={new THREE.Euler(Math.PI/3.77,0,0)} files="/neutral_HDR.jpg" background={false} />
-        <CameraControls makeDefault />
+        {/* <Environment environmentRotation={new THREE.Euler(Math.PI/3.77,0,0)} files="/neutral_HDR.jpg" background={false} /> */}
+        <SceneEnv />
+        {/* <CameraControls makeDefault /> */}
         <HandScene
           variant="hand1"
           scale={scale}

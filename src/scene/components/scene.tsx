@@ -1,4 +1,5 @@
 import Gradient from "../../components/gradient/gradient"
+import Graniet from "../../components/gradient/graniet"
 import { Hand } from "../../components/models/Hand"
 import { Hand2 } from "../../components/models/Hand2"
 
@@ -20,7 +21,8 @@ const HandScene = ({
   return (
     <>
       {/* Shared gradient background */}
-      <Gradient colorA={color} colorB="#000000" />
+      {/* <Gradient colorA={color} colorB="#000000" /> */}
+      <Graniet />
 
       {/* Shared transform */}
       <group scale={scale} position={position} rotation={rotation}>
