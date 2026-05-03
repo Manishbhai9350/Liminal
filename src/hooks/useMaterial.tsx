@@ -21,6 +21,7 @@ export function useMaterial(
         node.material.color.set(color);
         node.material.metalness = metalness;
         node.material.roughness = roughness;
+        node.material.side = 2
       }
     });
   }, [scene, color, metalness, roughness]);

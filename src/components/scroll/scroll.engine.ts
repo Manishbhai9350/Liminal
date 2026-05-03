@@ -63,6 +63,8 @@ export class ScrollEngine {
 
   // 🎯 Input
   private handleWheel = (e: WheelEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     const delta =
       Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY), 60);
 

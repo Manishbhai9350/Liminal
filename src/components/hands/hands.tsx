@@ -8,6 +8,7 @@ import * as THREE from "three";
 import React, { useEffect, useRef, type RefObject } from "react";
 import { useControls } from "leva";
 import { useMaterial } from "../../hooks/useMaterial";
+import { useScroll } from "../scroll/useScroll";
 
 const lembda = 1;
 
@@ -19,14 +20,30 @@ interface HandProps extends React.ComponentProps<"group"> {
 }
 
 export function Arm1(props: HandProps) {
-  const { scene } = useGLTF("/models/arm.glb");
+  const { scene } = useGLTF("/models/fixedarm.glb");
 
   const groupRef = useRef<THREE.Group>(null!);
   const rotationRef = useRef({ x: 0, y: 0 });
 
-  const baseRotation = new THREE.Euler(0, 0.5, 0);
+  const baseRotation = new THREE.Euler(0, 0, 0);
 
   const { maxRotation } = useMaterial(scene);
+
+  const scroll =  useScroll();
+
+  useEffect(() => {
+    const handleUpdate = (data: {
+      progress: number;
+      current: number;
+      target: number;
+    }) => {
+      baseRotation.y = data.progress * Math.PI * 2;
+    };
+    scroll.on("update", handleUpdate);
+    return () => {
+      scroll.off("update", handleUpdate);
+    };
+  }, [scroll,baseRotation]);
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
@@ -55,16 +72,16 @@ export function Arm1(props: HandProps) {
   });
 
   return (
-    <group ref={groupRef} position={[0, 0, -1]} scale={0.65} {...props}>
-      <Center>
+    <group ref={groupRef} position={[0, 8, -2]} scale={0.8} {...props}>
+      {/* <Center> */}
         <primitive object={scene} />
-      </Center>
+      {/* </Center> */}
     </group>
   );
 }
 
 export function Arm2(props: HandProps) {
-  const { scene } = useGLTF("/models/arm.glb");
+  const { scene } = useGLTF("/models/arm2.glb");
 
   const groupRef = useRef<THREE.Group>(null!);
   const rotationRef = useRef({ x: 0, y: 0 });
@@ -109,7 +126,7 @@ export function Arm2(props: HandProps) {
 }
 
 export function Hand1(props: HandProps) {
- const { scene } = useGLTF("/models/arm.glb");
+ const { scene } = useGLTF("/models/actionhand.glb");
 
   const groupRef = useRef<THREE.Group>(null!);
   const rotationRef = useRef({ x: 0, y: 0 });
@@ -154,7 +171,7 @@ export function Hand1(props: HandProps) {
 }
 
 export function Hand2(props: HandProps) {
- const { scene } = useGLTF("/models/arm.glb");
+ const { scene } = useGLTF("/models/the_hand.glb");
 
   const groupRef = useRef<THREE.Group>(null!);
   const rotationRef = useRef({ x: 0, y: 0 });

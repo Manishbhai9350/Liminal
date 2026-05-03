@@ -41,6 +41,9 @@ importers:
       tsl:
         specifier: ^1.0.30
         version: 1.0.30(typescript@6.0.2)
+      vite-plugin-glsl:
+        specifier: ^1.6.0
+        version: 1.6.0(esbuild@0.27.7)(vite@8.0.8(@types/node@24.12.2)(esbuild@0.27.7))
       webgpu:
         specifier: ^0.4.0
         version: 0.4.0
@@ -1738,6 +1741,19 @@ packages:
   v8n@1.5.1:
     resolution: {integrity: sha512-LdabyT4OffkyXFCe9UT+uMkxNBs5rcTVuZClvxQr08D5TUgo1OFKkoT65qYRCsiKBl/usHjpXvP4hHMzzDRj3A==}
 
+  vite-plugin-glsl@1.6.0:
+    resolution: {integrity: sha512-3i3ZvIVb13LhTcAXEHGTOW+cNG2jbJ++XsDFyCWUpnoFN1NPXvdtC4j66pig+i0QjDnmusOK/YCpiDWizxBY0A==}
+    engines: {node: '>= 20.17.0', npm: '>= 10.8.3'}
+    peerDependencies:
+      '@rollup/pluginutils': ^5.x
+      esbuild: '>= 0.25'
+      vite: '>= 3.x'
+    peerDependenciesMeta:
+      '@rollup/pluginutils':
+        optional: true
+      esbuild:
+        optional: true
+
   vite@8.0.8:
     resolution: {integrity: sha512-dbU7/iLVa8KZALJyLOBOQ88nOXtNG8vxKuOT4I2mD+Ya70KPceF4IAmDsmU0h1Qsn5bPrvsY9HJstCRh3hG6Uw==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -3372,6 +3388,12 @@ snapshots:
   utility-types@3.11.0: {}
 
   v8n@1.5.1: {}
+
+  vite-plugin-glsl@1.6.0(esbuild@0.27.7)(vite@8.0.8(@types/node@24.12.2)(esbuild@0.27.7)):
+    dependencies:
+      vite: 8.0.8(@types/node@24.12.2)(esbuild@0.27.7)
+    optionalDependencies:
+      esbuild: 0.27.7
 
   vite@8.0.8(@types/node@24.12.2)(esbuild@0.27.7):
     dependencies:

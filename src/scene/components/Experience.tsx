@@ -36,7 +36,7 @@ const Experience = () => {
       posX: { value: -2.7, min: -10, max: 10, step: 0.1 },
       posY: { value: -12, min: -15, max: 10, step: 0.1 },
       posZ: { value: -10, min: -10, max: 10, step: 0.1 },
-      scale: { value: 0.7, min: 0.1, max: 5, step: 0.01 },
+      scale: { value: 1, min: 0.1, max: 5, step: 0.01 },
       rotX: { value: 0.25, min: -Math.PI * 2, max: Math.PI * 2, step: 0.01 },
       rotY: { value: 4.55, min: -Math.PI * 2, max: Math.PI * 2, step: 0.01 },
       rotZ: { value: 0, min: -Math.PI * 2, max: Math.PI * 2, step: 0.01 },
@@ -117,11 +117,12 @@ const Experience = () => {
         }}
       >
         <Stats />
+
         {/* <Gradient /> */}
         {/* {lights} */}
         {/* <Environment environmentRotation={new THREE.Euler(Math.PI/3.77,0,0)} files="/neutral_HDR.jpg" background={false} /> */}
         <SceneEnv />
-        <CameraControls makeDefault />
+        {/* <CameraControls makeDefault /> */}
         <HandScene
           mouse={mouse}
           variant={model}
