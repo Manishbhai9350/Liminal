@@ -9,8 +9,8 @@ export function useMaterial(
     "Hand Controls",
     {
       color: "#0029ff",
-      metalness: { value: 0.88, min: 0, max: 1 },
-      roughness: { value: 0.5, min: 0, max: 1 },
+      metalness: { value: 0.6, min: 0, max: 1 },
+      roughness: { value: 0, min: 0, max: 1 },
       maxRotation: { value: 0.3, min: 0, max: 2 },
     },
   );

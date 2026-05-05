@@ -8,14 +8,16 @@ export const ScrollContext = createContext<ScrollEngine | null>(null);
 export const ScrollProvider = ({
   children,
   paused = false,
+  max
 }: {
   children: React.ReactNode;
   paused?: boolean;
+  max?: number;
 }) => {
   const engineRef = useRef<ScrollEngine | null>(null);
 
   if (!engineRef.current) {
-    engineRef.current = new ScrollEngine({ paused });
+    engineRef.current = new ScrollEngine({ paused, max });
   }
 
   return (

@@ -63,8 +63,8 @@ export class ScrollEngine {
 
   // 🎯 Input
   private handleWheel = (e: WheelEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+    // e.preventDefault();
+    // e.stopPropagation();
     const delta =
       Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY), 60);
 
@@ -135,13 +135,13 @@ export class ScrollEngine {
   // 🚀 Init
   private init() {
     window.addEventListener("wheel", this.handleWheel, {
-      passive: true,
+      passive: false,
     });
     window.addEventListener("touchstart", this.handleTouchStart, {
-      passive: true,
+      passive: false,
     });
     window.addEventListener("touchmove", this.handleTouchMove, {
-      passive: true,
+      passive: false,
     });
 
     this.loop();

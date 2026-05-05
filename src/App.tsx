@@ -18,6 +18,7 @@ const App = () => {
           <Experience />
         </main>
       </ScrollProvider>
+      
     );
   } else if (path === "/transition") {
     return <TransitionPage />;

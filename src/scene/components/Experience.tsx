@@ -63,7 +63,7 @@ const Experience = () => {
       },
       rotZ2: { value: 0, min: -Math.PI * 2, max: Math.PI * 2, step: 0.01 },
       model: {
-        value: "arm1",
+        value: "hand2",
         options: ["arm1", "arm2", "hand1", "hand2"],
       },
     },

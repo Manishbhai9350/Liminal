@@ -22,8 +22,8 @@ const SceneEnv = ({ file = "/neutral_HDR.jpg", background = false }) => {
     target.current.set(state.mouse.x, state.mouse.y);
     current.current.lerp(target.current, 0.05);
 
-    const rotX = baseRotation.x - current.current.y * 0;
-    const rotY = baseRotation.y + current.current.x * 0;
+    const rotX = baseRotation.x - current.current.y;
+    const rotY = baseRotation.y - current.current.x;
 
     // ⚠️ create new Euler (important for React state)
     setRotation(new THREE.Euler(rotX, rotY, 0));
