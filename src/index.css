@@ -209,8 +209,12 @@ main.app {
         }
       }
     }
+ }
+}
 
-
+@media (max-width: 900px) {
+  .cursor {
+    display: none;
   }
 }
 

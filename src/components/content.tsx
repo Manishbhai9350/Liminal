@@ -256,7 +256,7 @@ const Content = ({
         <h3 ref={ScrollCueRef} className="scroll-cue poppins">
           {scrollCue}
         </h3>
-        {scene == "sceneA" ? (
+        {scene == "sceneA" && (
           <>
             <div
               ref={ProgressStatusRef}
@@ -266,18 +266,6 @@ const Content = ({
             </div>
             <div ref={ProgressBarParentRef} className="progress-bar">
               <div ref={ProgressBarRef} className="progress-bar-inside"></div>
-            </div>
-          </>
-        ) : (
-          <>
-            <div
-              style={{ opacity: 0 }}
-              className="scroll-progress-number poppins"
-            >
-              00%
-            </div>
-            <div style={{ opacity: 0 }} className="progress-bar">
-              <div className="progress-bar-inside"></div>
             </div>
           </>
         )}
