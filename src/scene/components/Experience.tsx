@@ -33,7 +33,7 @@ const Experience = () => {
     "Scene Controls",
     {
       // 🔵 Model 1
-      posX: { value: -2.7, min: -10, max: 10, step: 0.1 },
+      posX: { value: -2.2, min: -10, max: 10, step: 0.1 },
       posY: { value: -12, min: -15, max: 10, step: 0.1 },
       posZ: { value: -10, min: -10, max: 10, step: 0.1 },
       scale: { value: 1, min: 0.1, max: 5, step: 0.01 },
@@ -63,7 +63,7 @@ const Experience = () => {
       },
       rotZ2: { value: 0, min: -Math.PI * 2, max: Math.PI * 2, step: 0.01 },
       model: {
-        value: "hand2",
+        value: "arm1",
         options: ["arm1", "arm2", "hand1", "hand2"],
       },
     },

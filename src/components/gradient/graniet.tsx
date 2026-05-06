@@ -118,6 +118,8 @@ const Graniet = ({ colorA, colorB }: { colorA: string; colorB: string }) => {
 
     mat.uZoom = controls.zoom;
 
+  }, {
+    collapsed: true
   });
 
   const camera = useThree((v) => v.camera as PerspectiveCamera);
