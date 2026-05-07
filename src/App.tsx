@@ -13,6 +13,8 @@ const App = () => {
   const path = useRoute();
 
   const snapConfig: SnapZone[] = [
+
+    // All The Text Area Snapping
     {
       start: SCENE_CONFIG.sceneA_fadeOut.startProg,
       end: SCENE_CONFIG.sceneA_fadeOut.endProg,
@@ -22,8 +24,40 @@ const App = () => {
       lerpFn: (cur, tgt, f) => cur + (tgt - cur) * f, // plain linear lerp
     },
     {
+      start: SCENE_CONFIG.sceneA_fadeIn.startProg,
+      end: SCENE_CONFIG.sceneA_fadeIn.endProg,
+      pin:'end',
+      snapIdleMs: 1000,
+      lerp: 0.03, // slower snap animation
+      lerpFn: (cur, tgt, f) => cur + (tgt - cur) * f, // plain linear lerp
+    },
+    {
+      start: SCENE_CONFIG.sceneB_fadeOut.startProg,
+      end: SCENE_CONFIG.sceneB_fadeOut.endProg,
+      pin:'start',
+      snapIdleMs: 1000,
+      lerp: 0.03, // slower snap animation
+      lerpFn: (cur, tgt, f) => cur + (tgt - cur) * f, // plain linear lerp
+    },
+    {
+      start: SCENE_CONFIG.sceneB_fadeIn.startProg,
+      end: SCENE_CONFIG.sceneB_fadeIn.endProg,
+      pin:'end',
+      snapIdleMs: 1000,
+      lerp: 0.03, // slower snap animation
+      lerpFn: (cur, tgt, f) => cur + (tgt - cur) * f, // plain linear lerp
+    },
+    {
       start: SCENE_CONFIG.transitionAtoB.startProg,
       end: SCENE_CONFIG.transitionAtoB.endProg,
+      lerp:.05,
+      snapIdleMs:500
+    },
+    {
+      start: SCENE_CONFIG.transitionBtoA.startProg,
+      end: SCENE_CONFIG.transitionBtoA.endProg,
+      lerp:.05,
+      snapIdleMs:500
     },
   ];
 

@@ -256,6 +256,9 @@ main.app {
       .typo .description {
         max-width: 500px !important;
       }
+      .sub-typo {
+        margin-bottom: 2.3rem;
+      }
     }
   }
 }
