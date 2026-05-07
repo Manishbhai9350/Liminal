@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { DATA } from "../config/data";
+import { DATA } from "../../config/data";
 import Content from "./content";
-import { useScroll } from "./scroll/useScroll";
+import { useScroll } from "../scroll/useScroll";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 

@@ -1,10 +1,10 @@
 import { useEffect, useRef, type Dispatch, type SetStateAction } from "react";
-import type { DataType } from "../config/data";
+import type { DataType } from "../../config/data";
 import { useGSAP } from "@gsap/react";
-import { SplitIt } from "../utils";
+import { SplitIt } from "../../utils";
 import gsap from "gsap";
-import { SCENE_CONFIG } from "../config/scene.config";
-import { useScroll } from "./scroll/useScroll";
+import { SCENE_CONFIG } from "../../config/scene.config";
+import { useScroll } from "../scroll/useScroll";
 
 interface ContentProps extends DataType {
   scene: "sceneA" | "sceneB";

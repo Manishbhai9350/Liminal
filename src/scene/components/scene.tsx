@@ -1,13 +1,19 @@
-import { useMemo } from "react";
+import { useMemo, type RefObject } from "react";
 import Graniet from "../../components/gradient/graniet";
 import { Arm1, Arm2, Hand1, Hand2 } from "../../components/hands/hands";
 
 type HandSceneProps = {
-  variant: "arm1" | "arm2" | "hand1" | "hand2";
+  mouse: RefObject<{
+    x: number;
+    y: number;
+}>;
+  variant: string | "arm1" | "arm2" | "hand1" | "hand2";
   scale: number;
   position: [number, number, number];
   rotation: [number, number, number];
-  color: string;
+  colorA: string;
+  colorB: string;
+  colorC: string;
 };
 
 const HandScene = ({
@@ -16,7 +22,9 @@ const HandScene = ({
   scale,
   position,
   rotation,
-  color,
+  colorA,
+  colorB,
+  colorC
 }: HandSceneProps) => {
   const Hand = useMemo(() => {
     if (variant == "arm1") return <Arm1 mouse={mouse} />;
@@ -30,7 +38,7 @@ const HandScene = ({
     <>
       {/* Shared gradient background */}
       {/* <Gradient colorA={color} colorB="#000000" /> */}
-      <Graniet />
+      <Graniet colorA={colorA} colorB={colorB} colorC={colorC} />
 
       {/* Shared transform */}
       <group scale={scale} position={position} rotation={rotation}>

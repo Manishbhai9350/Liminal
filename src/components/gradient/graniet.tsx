@@ -32,9 +32,9 @@ const GranietMaterial = shaderMaterial(
     uGrainScale: 2.0,
     uGrainAnimated: 0.0, // ⚠️ float, not boolean
 
-    uContrast: 1.17 /* 3.0 */ ,
+    uContrast: 1.17 /* 3.0 */,
     uGamma: 1.3,
-    uSaturation: .78 /* .3 */,
+    uSaturation: 0.78 /* .3 */,
 
     uCenterOffset: new THREE.Vector2(0, 0),
     uZoom: 0.9,
@@ -48,13 +48,21 @@ const GranietMaterial = shaderMaterial(
 );
 extend({ GranietMaterial });
 
-const Graniet = ({ colorA, colorB }: { colorA: string; colorB: string }) => {
-  const MatRef = useRef();
+const Graniet = ({
+  colorA,
+  colorB,
+  colorC,
+}: {
+  colorA: string;
+  colorB: string;
+  colorC: string;
+}) => {
+  const MatRef = useRef(null);
 
   const mouse = useThree((state) => state.mouse);
 
   const controls = useControls("Graniet Controlrs", {
-    timeSpeed: { value: .4, min: 0, max: 5, step: 0.01 },
+    timeSpeed: { value: 0.4, min: 0, max: 5, step: 0.01 },
     colorBalance: { value: 0.0, min: -1, max: 1, step: 0.01 },
 
     warpStrength: { value: 1.0, min: 0, max: 10, step: 0.01 },
@@ -69,7 +77,7 @@ const Graniet = ({ colorA, colorB }: { colorA: string; colorB: string }) => {
 
     noiseScale: { value: 2.0, min: 0, max: 10, step: 0.1 },
 
-    grainAmount: { value: .1, min: 0, max: 1, step: 0.01 },
+    grainAmount: { value: 0.1, min: 0, max: 1, step: 0.01 },
     grainScale: { value: 2.0, min: 0, max: 10, step: 0.1 },
     grainAnimated: false,
 
@@ -81,46 +89,48 @@ const Graniet = ({ colorA, colorB }: { colorA: string; colorB: string }) => {
     centerY: { value: 0.0, min: -1, max: 1, step: 0.01 },
     zoom: { value: 0.9, min: 0.1, max: 3, step: 0.01 },
 
-    color1: "#000000",
-    color2: "#2800c7",
-    color3: "#00b5f2",
+    color1: colorA,
+    color2: colorB,
+    color3: colorC,
   });
 
-  useFrame((state) => {
-    if (!MatRef.current) return;
+  useFrame(
+    (state) => {
+      if (!MatRef.current) return;
 
-    const mat = MatRef.current;
+      const mat = MatRef.current;
 
-    mat.iTime = state.clock.elapsedTime;
+      mat.iTime = state.clock.elapsedTime;
 
-    mat.uTimeSpeed = controls.timeSpeed;
-    mat.uColorBalance = controls.colorBalance;
+      mat.uTimeSpeed = controls.timeSpeed;
+      mat.uColorBalance = controls.colorBalance;
 
-    mat.uWarpStrength = controls.warpStrength;
-    mat.uWarpFrequency = controls.warpFrequency;
-    mat.uWarpSpeed = controls.warpSpeed;
-    mat.uWarpAmplitude = controls.warpAmplitude;
+      mat.uWarpStrength = controls.warpStrength;
+      mat.uWarpFrequency = controls.warpFrequency;
+      mat.uWarpSpeed = controls.warpSpeed;
+      mat.uWarpAmplitude = controls.warpAmplitude;
 
-    mat.uBlendAngle = controls.blendAngle;
-    mat.uBlendSoftness = controls.blendSoftness;
+      mat.uBlendAngle = controls.blendAngle;
+      mat.uBlendSoftness = controls.blendSoftness;
 
-    mat.uRotationAmount = controls.rotationAmount;
+      mat.uRotationAmount = controls.rotationAmount;
 
-    mat.uNoiseScale = controls.noiseScale;
+      mat.uNoiseScale = controls.noiseScale;
 
-    mat.uGrainAmount = controls.grainAmount;
-    mat.uGrainScale = controls.grainScale;
-    mat.uGrainAnimated = controls.grainAnimated ? 1.0 : 0.0;
+      mat.uGrainAmount = controls.grainAmount;
+      mat.uGrainScale = controls.grainScale;
+      mat.uGrainAnimated = controls.grainAnimated ? 1.0 : 0.0;
 
-    mat.uContrast = controls.contrast;
-    mat.uGamma = controls.gamma;
-    mat.uSaturation = controls.saturation;
+      mat.uContrast = controls.contrast;
+      mat.uGamma = controls.gamma;
+      mat.uSaturation = controls.saturation;
 
-    mat.uZoom = controls.zoom;
-
-  }, {
-    collapsed: true
-  });
+      mat.uZoom = controls.zoom;
+    },
+    {
+      collapsed: true,
+    },
+  );
 
   const camera = useThree((v) => v.camera as PerspectiveCamera);
 
@@ -143,13 +153,19 @@ const Graniet = ({ colorA, colorB }: { colorA: string; colorB: string }) => {
     mat.iResolution.set(window.innerWidth, window.innerHeight);
     // mat.uCenterOffset.set(controls.centerX, controls.centerY);
     mat.uCenterOffset.set(0, 0);
-    
+
     mat.uColor1.set(controls.color1);
     mat.uColor2.set(controls.color2);
     mat.uColor3.set(controls.color3);
 
     return () => {};
-  }, [innerWidth, innerHeight, controls.color1,controls.color2,controls.color3]);
+  }, [
+    innerWidth,
+    innerHeight,
+    controls.color1,
+    controls.color2,
+    controls.color3,
+  ]);
 
   return (
     <>

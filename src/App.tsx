@@ -1,5 +1,5 @@
 import gsap from "gsap";
-import UI from "./components/ui";
+import UI from "./components/ui/ui";
 import { SplitText } from "gsap/SplitText";
 import { ScrollProvider } from "./components/scroll/scroll.provider";
 import Experience from "./scene/components/Experience";
@@ -72,7 +72,7 @@ const App = () => {
         <div className="bg"></div>
         <main className="app">
           <UI />
-          <Experience />
+          <Experience mode="transition" />
         </main>
       </ScrollProvider>
     );
