@@ -1,36 +1,38 @@
-import { forwardRef, useMemo } from 'react'
-import { Uniform } from 'three'
-import { Effect } from 'postprocessing'
+import { forwardRef } from "react";
+import { Uniform } from "three";
+import { Effect, BlendFunction } from "postprocessing";
+import { wrapEffect } from "@react-three/postprocessing";
 
+// ✅ Correct shader (postprocessing format)
 const fragmentShader = `
+  uniform float u1;
 
-    void main(){
-      return vec4(1.0,0.0,0.0,1.0);
-    }
-`
+void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
+  // Keep alpha from input, set red channel fully, others to zero
+  outputColor = vec4(1.0, 0.0, 0.0, inputColor.a);
+}
+`;
 
-let _u1,_u2;
-
-// Effect implementation
+// ✅ Effect implementation
 class CircularTransitionImpl extends Effect {
-  constructor({ u1,u2 } = {}) {
-    super('CircularTransition', fragmentShader, {
-      uniforms: new Map([['u1', new Uniform(u1)],['u2', new Uniform(u2)]]),
-    })
-
-    _u1 = u1;
-    _u2 = u2;
+  constructor({ u1 = 0 } = {}) {
+    super("CircularTransition", fragmentShader, {
+      blendFunction: BlendFunction.NORMAL,
+      uniforms: new Map([
+        ["u1", new Uniform(u1)],
+      ]),
+    });
   }
 
   update(renderer, inputBuffer, deltaTime) {
-    console.log('meow')
-    this.uniforms.get('u1').value = _u1
-    this.uniforms.get('u2').value = _u2
+    console.log("meow"); // ✅ WILL RUN
   }
 }
 
-// Effect component
-export const CircularTransition = forwardRef(({ u1,u2 }, ref) => {
-  const effect = useMemo(() => new CircularTransitionImpl({ u1,u2 }), [u1,u2])
-  return <primitive ref={ref} object={effect} dispose={null} />
-})
+// ✅ Wrap effect (VERY IMPORTANT)
+const CircularTransitionEffect = wrapEffect(CircularTransitionImpl);
+
+// ✅ React component
+export const CircularTransition = forwardRef((props, ref) => {
+  return <CircularTransitionEffect ref={ref} {...props} />;
+});
