@@ -52,16 +52,18 @@ const Graniet = ({
   colorA,
   colorB,
   colorC,
+  offsetTime = 0,
 }: {
   colorA: string;
   colorB: string;
   colorC: string;
+  offsetTime?: number;
 }) => {
   const MatRef = useRef(null);
 
   const mouse = useThree((state) => state.mouse);
 
-  const controls = useControls("Graniet Controlrs", {
+  const controls = useControls("Graniet Controlrs "+colorB, {
     timeSpeed: { value: 0.4, min: 0, max: 5, step: 0.01 },
     colorBalance: { value: 0.0, min: -1, max: 1, step: 0.01 },
 
@@ -92,6 +94,8 @@ const Graniet = ({
     color1: colorA,
     color2: colorB,
     color3: colorC,
+  }, {
+    collapsed:true
   });
 
   useFrame(
@@ -100,7 +104,7 @@ const Graniet = ({
 
       const mat = MatRef.current;
 
-      mat.iTime = state.clock.elapsedTime;
+      mat.iTime = state.clock.elapsedTime + offsetTime;
 
       mat.uTimeSpeed = controls.timeSpeed;
       mat.uColorBalance = controls.colorBalance;
@@ -126,11 +130,7 @@ const Graniet = ({
       mat.uSaturation = controls.saturation;
 
       mat.uZoom = controls.zoom;
-    },
-    {
-      collapsed: true,
-    },
-  );
+    });
 
   const camera = useThree((v) => v.camera as PerspectiveCamera);
 

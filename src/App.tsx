@@ -7,6 +7,7 @@ import { useRoute } from "./utils/route";
 import TransitionPage from "./experiment/transition";
 import { SCENE_CONFIG } from "./config/scene.config";
 import type { SnapZone } from "./components/scroll/scroll.engine";
+import { useControls } from "leva";
 
 gsap.registerPlugin(SplitText);
 const App = () => {
@@ -61,6 +62,13 @@ const App = () => {
     },
   ];
 
+  const { mode } = useControls({
+    mode:{
+      value:'TransitionToB',
+      options:['A','B','TransitionToA','TransitionToB']
+    }
+  })
+
   if (path === "/") {
     return (
       <ScrollProvider
@@ -71,8 +79,8 @@ const App = () => {
       >
         <div className="bg"></div>
         <main className="app">
-          <UI />
-          <Experience mode="transition" />
+          {/* <UI /> */}
+          <Experience mode={mode} />
         </main>
       </ScrollProvider>
     );

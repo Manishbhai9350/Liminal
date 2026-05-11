@@ -16,17 +16,20 @@ interface HandProps extends React.ComponentProps<"group"> {
     x: number;
     y: number;
   }>;
+  color: string;
 }
 
 export function Arm1(props: HandProps) {
   const { scene } = useGLTF("/models/fixedarm.glb");
+
+  console.log(props.color)
 
   const groupRef = useRef<THREE.Group>(null!);
   const rotationRef = useRef({ x: 0, y: 0 });
 
   const baseRotation = new THREE.Euler(0, 0, 0);
 
-  const { maxRotation } = useMaterial(scene);
+  const { maxRotation } = useMaterial(scene,props.color);
 
   const scroll = useScroll();
 
@@ -87,7 +90,7 @@ export function Arm2(props: HandProps) {
 
   const baseRotation = new THREE.Euler(0, 0.3, 0);
 
-  const { maxRotation } = useMaterial(scene);
+  const { maxRotation } = useMaterial(scene,props.color);
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
@@ -132,7 +135,7 @@ export function Hand1(props: HandProps) {
 
   const baseRotation = new THREE.Euler(0, Math.PI * 0.2, 0);
 
-  const { maxRotation } = useMaterial(scene);
+  const { maxRotation } = useMaterial(scene,props.color);
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
@@ -170,42 +173,64 @@ export function Hand1(props: HandProps) {
 }
 
 export function Hand2(props: HandProps) {
-  const { scene, animations } = useGLTF("/models/use/the_hand.glb");
+  console.log(props.color)
+
+  const { scene, animations } = useGLTF("/models/use/hand.glb");
 
   const groupRef = useRef<THREE.Group>(null!);
   const rotationRef = useRef({ x: 0, y: 0 });
 
-  const baseRotation = new THREE.Euler(0, -Math.PI * 0.2, 0);
+  const baseRotation = new THREE.Euler(Math.PI, 0,-Math.PI / 2);
 
-  const { maxRotation } = useMaterial(scene);
+  const { maxRotation } = useMaterial(scene,props.color);
 
   const { actions } = useAnimations(animations, groupRef);
 
-  const { animation } = useControls({
-    animation: {
-      value: "Fuck",
-      options: [
-        "Fuck",
-        "GrabHold",
-        "GrabRelease",
-        "kulack",
-        "One",
-        "Peace_finger",
-        "Rock_finger",
-        "Three",
-      ],
-    },
-  });
+  // const { animation } = useControls({
+  //   animation: {
+  //     value: "Fuck",
+  //     options: [
+  //       "Fuck",
+  //       "GrabHold",
+  //       "GrabRelease",
+  //       "kulack",
+  //       "One",
+  //       "Peace_finger",
+  //       "Rock_finger",
+  //       "Three",
+  //     ],
+  //   },
+  //   rotationX: {
+  //     value: 0,
+  //     min: -Math.PI,
+  //     max: Math.PI,
+  //     step:.001
+  //   },
+  //   rotationY: {
+  //     value: 0,
+  //     min: -Math.PI,
+  //     max: Math.PI,
+  //     step:.001
+  //   },
+  //   rotationZ: {
+  //     value: 0,
+  //     min: -Math.PI,
+  //     max: Math.PI,
+  //     step:.001
+  //   },
+  // },{
+  //   collapsed:true
+  // });
 
-  useEffect(() => {
-    actions[animation]?.reset()
-    actions[animation]?.fadeIn(.3);
-    actions[animation]?.play();
+  // useEffect(() => {
+  //   actions[animation]?.reset()
+  //   actions[animation]?.fadeIn(.3);
+  //   actions[animation]?.play();
 
-    return () => {
-      actions[animation]?.reset();
-    };
-  }, [actions, animation]);
+  //   return () => {
+  //     actions[animation]?.reset();
+  //   };
+  // }, [actions, animation]);
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
@@ -229,12 +254,18 @@ export function Hand2(props: HandProps) {
     groupRef.current.rotation.y =
       baseRotation.y + (rotationRef.current.x * maxRotation) / 3;
 
-    groupRef.current.rotation.x =
-      baseRotation.x + rotationRef.current.y * maxRotation * 0.2;
+    // groupRef.current.rotation.x =
+    //   baseRotation.x + rotationRef.current.y * maxRotation * 0.2;
   });
 
   return (
-    <group position={[0, 5, -7]} scale={11} ref={groupRef} {...props}>
+    <group
+      rotation={baseRotation}
+      position={[-.8, 0, 0]}
+      scale={2.2}
+      ref={groupRef}
+      {...props}
+    >
       <primitive object={scene} />
     </group>
   );

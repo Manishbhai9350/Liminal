@@ -103,6 +103,8 @@ const Gradient = ({ colorA, colorB }: { colorA: string; colorB: string }) => {
       max: 1,
       step: 0.01,
     },
+  },{
+    collapsed:true
   });
 
   useEffect(() => {

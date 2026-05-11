@@ -18,9 +18,7 @@ class CircularTransitionImpl extends Effect {
   constructor({ u1 = 0 } = {}) {
     super("CircularTransition", fragmentShader, {
       blendFunction: BlendFunction.NORMAL,
-      uniforms: new Map([
-        ["u1", new Uniform(u1)],
-      ]),
+      uniforms: new Map([["u1", new Uniform(u1)]]),
     });
   }
 

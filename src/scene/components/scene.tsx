@@ -11,6 +11,7 @@ type HandSceneProps = {
   scale: number;
   position: [number, number, number];
   rotation: [number, number, number];
+  color: string;
   colorA: string;
   colorB: string;
   colorC: string;
@@ -22,23 +23,25 @@ const HandScene = ({
   scale,
   position,
   rotation,
+  color,
   colorA,
   colorB,
   colorC
 }: HandSceneProps) => {
+  console.log(variant,color)
   const Hand = useMemo(() => {
-    if (variant == "arm1") return <Arm1 mouse={mouse} />;
-    if (variant == "arm2") return <Arm2 mouse={mouse} />;
-    if (variant == "hand1") return <Hand1 mouse={mouse} />;
-    if (variant == "hand2") return <Hand2 mouse={mouse} />;
+    if (variant == "arm1") return <Arm1 color={color} mouse={mouse} />;
+    if (variant == "arm2") return <Arm2 color={color} mouse={mouse} />;
+    if (variant == "hand1") return <Hand1 color={color} mouse={mouse} />;
+    if (variant == "hand2") return <Hand2 color={color} mouse={mouse} />;
     return null;
-  }, [variant]);
+  }, [variant,color]);
 
   return (
     <>
       {/* Shared gradient background */}
       {/* <Gradient colorA={color} colorB="#000000" /> */}
-      <Graniet colorA={colorA} colorB={colorB} colorC={colorC} />
+      <Graniet offsetTime={ variant == 'arm1' ? 10 : 0 } colorA={colorA} colorB={colorB} colorC={colorC} />
 
       {/* Shared transform */}
       <group scale={scale} position={position} rotation={rotation}>
