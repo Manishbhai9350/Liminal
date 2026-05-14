@@ -6,8 +6,14 @@ import { forwardRef, useEffect, useMemo, useRef } from "react";
 
 import HandScene from "./scene";
 import SceneEnv from "../../components/env/environment";
-import { EffectComposer, Noise } from "@react-three/postprocessing";
+import {
+  ColorAverage,
+  EffectComposer,
+  Noise,
+  Vignette,
+} from "@react-three/postprocessing";
 import { CircularTransition } from "../../components/postprocessing/effects/CircularTransition";
+import GreenPass from "../../components/postprocessing/effects/Green.test";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -240,7 +246,7 @@ export const TempMesh = () => {
   const { width, height } = useThree((v) => v.viewport);
 
   const w = 5 / 2;
-  const h =  w * height / width;
+  const h = (w * height) / width;
 
   return (
     <mesh position={[-(width - w) / 2, -(height - h) / 2, 0]} ref={meshRef}>
@@ -351,9 +357,10 @@ const Experience = ({ mode = "A", onFBO }: ExperienceProps) => {
 
         <EffectComposer>
           {/* <Noise /> */}
+          {/* <ColorAverage /> */}
           {/* <Vignette /> */}
 
-          <CircularTransition u1={fbo.current} />
+          <CircularTransition />
         </EffectComposer>
       </Canvas>
     </>
