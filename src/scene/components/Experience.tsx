@@ -355,7 +355,7 @@ const Experience = ({ mode = "A", onFBO }: ExperienceProps) => {
           }}
         />
 
-        <EffectComposer>
+        <EffectComposer renderPriority={0}>
           {/* <Noise /> */}
           {/* <ColorAverage /> */}
           {/* <Vignette /> */}
