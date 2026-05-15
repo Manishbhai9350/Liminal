@@ -29,8 +29,10 @@ const SceneEnv = ({ file = "/neutral_HDR.jpg", background = false }) => {
     setRotation(new THREE.Euler(rotX, rotY, 0));
   });
 
+
   return (
     <Environment
+      files={file}
       map={envMap}
       environmentRotation={rotation}
       background={background}

@@ -28,7 +28,6 @@ const HandScene = ({
   colorB,
   colorC
 }: HandSceneProps) => {
-  console.log(variant,color)
   const Hand = useMemo(() => {
     if (variant == "arm1") return <Arm1 color={color} mouse={mouse} />;
     if (variant == "arm2") return <Arm2 color={color} mouse={mouse} />;

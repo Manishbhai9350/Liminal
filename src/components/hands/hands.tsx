@@ -22,8 +22,6 @@ interface HandProps extends React.ComponentProps<"group"> {
 export function Arm1(props: HandProps) {
   const { scene } = useGLTF("/models/fixedarm.glb");
 
-  console.log(props.color)
-
   const groupRef = useRef<THREE.Group>(null!);
   const rotationRef = useRef({ x: 0, y: 0 });
 
@@ -173,8 +171,6 @@ export function Hand1(props: HandProps) {
 }
 
 export function Hand2(props: HandProps) {
-  console.log(props.color)
-
   const { scene, animations } = useGLTF("/models/use/hand.glb");
 
   const groupRef = useRef<THREE.Group>(null!);

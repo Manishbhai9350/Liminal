@@ -25,8 +25,6 @@ const UI = () => {
     const cursor = cursorRef.current;
     if (!cursor) return;
 
-    console.log(cursor)
-
     let hasStarted = false;
 
     const mouseMove = (e: MouseEvent) => {

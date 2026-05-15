@@ -14,6 +14,13 @@ import {
 } from "@react-three/postprocessing";
 import { CircularTransition } from "../../components/postprocessing/effects/CircularTransition";
 import GreenPass from "../../components/postprocessing/effects/Green.test";
+import GreenEffect from "../../components/postprocessing/effects/Green.test";
+import { WebGPURenderer } from "three/webgpu";
+import type { WebGPURendererParameters } from "three/src/renderers/webgpu/WebGPURenderer.js";
+import { SimpleCheckNormalEffect } from "../../components/postprocessing/effects/simplecheck.test";
+import { ASCII } from "../../components/postprocessing/effects/Ascii.test";
+import { MyEffectComposer } from "../../components/postprocessing/effects/composer";
+import { ASCIIEffect } from "../../components/postprocessing/effects/ascii";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -112,57 +119,58 @@ const FBOCapture = ({
   mode,
   onFBO,
 }: FBOCaptureProps) => {
-  const { gl, scene, camera } = useThree();
-  const fbo = useFBO(256, 256);
+  // const { gl, scene, camera } = useThree();
+  // const fbo = useFBO(256, 256);
 
-  useFrame(() => {
-    const groupA = sceneARef.current;
-    const groupB = sceneBRef.current;
-    if (!groupA || !groupB || !tempRef.current) return;
+  // useFrame(() => {
+  //   const groupA = sceneARef.current;
+  //   const groupB = sceneBRef.current;
+  //   if (!groupA || !groupB || !tempRef.current) return;
 
-    tempRef.current.visible = false;
-    // If Current Scene Is A Then;
-    if (mode == "A") {
-      // Only Render Scene A;
-      groupA.visible = true;
-      groupB.visible = false;
-      gl.setRenderTarget(null);
-    } else if (mode == "B") {
-      // Only Render Scene B;
-      groupB.visible = true;
-      groupA.visible = false;
-      gl.setRenderTarget(null);
-    } else if (mode == "TransitionToB") {
-      groupA.visible = false;
-      groupB.visible = true;
+  //   tempRef.current.visible = false;
 
-      gl.setRenderTarget(fbo);
-      gl.clearColor(); // ← clear color buffer
-      gl.clearDepth(); // ← clear depth buffer
-      gl.render(scene, camera);
-      gl.setRenderTarget(null);
+  //   // If Current Scene Is A Then;
+  //   if (mode == "A") {
+  //     // Only Render Scene A;
+  //     groupA.visible = true;
+  //     groupB.visible = false;
+  //     gl.setRenderTarget(null);
+  //   } else if (mode == "B") {
+  //     // Only Render Scene B;
+  //     groupB.visible = true;
+  //     groupA.visible = false;
+  //     gl.setRenderTarget(null);
+  //   } else if (mode == "TransitionToB") {
+  //     groupA.visible = false;
+  //     groupB.visible = true;
 
-      groupA.visible = true;
-      groupB.visible = false;
-      tempRef.current.visible = true;
-    } else if (mode == "TransitionToA") {
-      groupA.visible = true;
-      groupB.visible = false;
+  //     gl.setRenderTarget(fbo);
+  //     gl.clearColor(); // ← clear color buffer
+  //     gl.clearDepth(); // ← clear depth buffer
+  //     gl.render(scene, camera);
+  //     gl.setRenderTarget(null);
 
-      gl.setRenderTarget(fbo);
-      gl.clearColor(); // ← clear color buffer
-      gl.clearDepth(); // ← clear depth buffer
-      gl.render(scene, camera);
-      gl.setRenderTarget(null);
+  //     groupA.visible = true;
+  //     groupB.visible = false;
+  //     tempRef.current.visible = true;
+  //   } else if (mode == "TransitionToA") {
+  //     groupA.visible = true;
+  //     groupB.visible = false;
 
-      groupA.visible = false;
-      groupB.visible = true;
-      tempRef.current.visible = true;
-    }
+  //     gl.setRenderTarget(fbo);
+  //     gl.clearColor(); // ← clear color buffer
+  //     gl.clearDepth(); // ← clear depth buffer
+  //     gl.render(scene, camera);
+  //     gl.setRenderTarget(null);
 
-    tempRef.current.children[0].material.map = fbo.texture;
-    onFBO(fbo.texture);
-  }, 1); // runs before default render
+  //     groupA.visible = false;
+  //     groupB.visible = true;
+  //     tempRef.current.visible = true;
+  //   }
+
+  //   tempRef.current.children[0].material.map = fbo.texture;
+  //   onFBO(fbo.texture);
+  // }, 1); // runs before default render
 
   useFrame(() => {
     if (!tempRef.current) return;
@@ -199,9 +207,9 @@ const SceneRenderer = ({
 
   return (
     <>
-      <group ref={tempRef}>
+      {/* <group ref={tempRef}>
         <TempMesh />
-      </group>
+      </group> */}
 
       <group ref={sceneARef} visible={initVisibleA}>
         {/* <Text position={[0,-2,0]}>
@@ -216,11 +224,11 @@ const SceneRenderer = ({
         {/* <Text position={[0,-2,0]}>
             Scene B
           </Text> */}
-        <SceneContent color="#ff0000" which="B" mouse={mouse} {...transformB} />
+        {/* <SceneContent color="#ff0000" which="B" mouse={mouse} {...transformB} /> */}
       </group>
 
       {/* FBOCapture only mounts here — useFBO/useFrame never run in A or B mode */}
-      {onFBO && (
+      {/* {onFBO && (
         <FBOCapture
           mode={mode}
           sceneARef={sceneARef}
@@ -228,7 +236,7 @@ const SceneRenderer = ({
           tempRef={tempRef}
           onFBO={onFBO}
         />
-      )}
+      )} */}
     </>
   );
 };
@@ -336,12 +344,21 @@ const Experience = ({ mode = "A", onFBO }: ExperienceProps) => {
 
   const fbo = useRef(null);
 
+  const asciiEffect = useMemo(() => new ASCIIEffect(), []);
+
   return (
     <>
       <Leva collapsed />
       <Canvas
         className="canvas-scene"
-        gl={{ toneMapping: THREE.NeutralToneMapping }}
+        // gl={async (props) => {
+        //   console.warn("WebGPU is supported");
+        //   const renderer = new WebGPURenderer(
+        //     props as WebGPURendererParameters,
+        //   );
+        //   await renderer.init();
+        //   return renderer;
+        // }}
       >
         <Stats />
         <CameraControls />
@@ -351,17 +368,27 @@ const Experience = ({ mode = "A", onFBO }: ExperienceProps) => {
           transformA={transformA}
           transformB={transformB}
           onFBO={(t) => {
-            fbo.current = t;
+            // fbo.current = t;
           }}
         />
 
-        <EffectComposer renderPriority={0}>
-          {/* <Noise /> */}
-          {/* <ColorAverage /> */}
-          {/* <Vignette /> */}
+        {/* <SceneEnv background /> */}
 
-          <CircularTransition />
+        {/* <mesh rotation={[.5,.77,.1]} >
+          <boxGeometry args={[2,2,2]} />
+          <meshStandardMaterial />
+        </mesh> */}
+
+        <EffectComposer>
+          {/* <Noise opacity={0.3} /> */}
+          {/* <ASCII /> */}
+          {/* <GreenEffect /> */}
+          <primitive object={asciiEffect} />
         </EffectComposer>
+
+        {/* <EffectComposer>
+          <GreenEffect />
+        </EffectComposer> */}
       </Canvas>
     </>
   );

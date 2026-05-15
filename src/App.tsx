@@ -64,7 +64,7 @@ const App = () => {
 
   const { mode } = useControls({
     mode:{
-      value:'TransitionToB',
+      value:'A',
       options:['A','B','TransitionToA','TransitionToB']
     }
   })
@@ -79,7 +79,7 @@ const App = () => {
       >
         <div className="bg"></div>
         <main className="app">
-          <UI />
+          {/* <UI /> */}
           <Experience mode={mode} />
         </main>
       </ScrollProvider>
