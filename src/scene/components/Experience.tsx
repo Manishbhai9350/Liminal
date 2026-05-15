@@ -21,6 +21,7 @@ import { SimpleCheckNormalEffect } from "../../components/postprocessing/effects
 import { ASCII } from "../../components/postprocessing/effects/Ascii.test";
 import { MyEffectComposer } from "../../components/postprocessing/effects/composer";
 import { ASCIIEffect } from "../../components/postprocessing/effects/ascii";
+import Graniet from "../../components/gradient/graniet";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -224,7 +225,7 @@ const SceneRenderer = ({
         {/* <Text position={[0,-2,0]}>
             Scene B
           </Text> */}
-        {/* <SceneContent color="#ff0000" which="B" mouse={mouse} {...transformB} /> */}
+        <SceneContent color="#ff0000" which="B" mouse={mouse} {...transformB} />
       </group>
 
       {/* FBOCapture only mounts here — useFBO/useFrame never run in A or B mode */}
@@ -348,7 +349,7 @@ const Experience = ({ mode = "A", onFBO }: ExperienceProps) => {
 
   return (
     <>
-      <Leva collapsed />
+      <Leva hidden collapsed />
       <Canvas
         className="canvas-scene"
         // gl={async (props) => {
@@ -360,7 +361,7 @@ const Experience = ({ mode = "A", onFBO }: ExperienceProps) => {
         //   return renderer;
         // }}
       >
-        <Stats />
+        {/* <Stats /> */}
         <CameraControls />
         <SceneRenderer
           mode={mode}
@@ -372,6 +373,8 @@ const Experience = ({ mode = "A", onFBO }: ExperienceProps) => {
           }}
         />
 
+        {/* <Graniet colorA={"#000000"} colorB={"#2800c7"} colorC={"#00b5f2"} /> */}
+
         {/* <SceneEnv background /> */}
 
         {/* <mesh rotation={[.5,.77,.1]} >
@@ -380,10 +383,10 @@ const Experience = ({ mode = "A", onFBO }: ExperienceProps) => {
         </mesh> */}
 
         <EffectComposer>
-          {/* <Noise opacity={0.3} /> */}
+          {/* <Noise opacity={0.01 } /> */}
           {/* <ASCII /> */}
           {/* <GreenEffect /> */}
-          <primitive object={asciiEffect} />
+          {/* <primitive object={asciiEffect} /> */}
         </EffectComposer>
 
         {/* <EffectComposer>
