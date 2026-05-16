@@ -69,8 +69,6 @@ export class ASCIIEffect extends Effect {
 
         super('ASCIIEffect', fragment, { uniforms });
 
-        console.log(uniforms)
-
         const charactersTextureUniform = this.uniforms.get('uCharacters');
 
         if (charactersTextureUniform) {
@@ -80,7 +78,6 @@ export class ASCIIEffect extends Effect {
 
     /** Draws the characters on a Canvas and returns a texture */
     public createCharactersTexture(characters: string, fontSize: number): THREE.Texture {
-        console.log('Creating Texture')
         const canvas = document.createElement('canvas');
 
         const SIZE = 1024;

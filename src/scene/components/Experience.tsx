@@ -1,27 +1,14 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useFBO, Stats, CameraControls, Text } from "@react-three/drei";
+import { useFBO, Stats } from "@react-three/drei";
 import * as THREE from "three";
 import { Leva, useControls } from "leva";
-import { forwardRef, useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import HandScene from "./scene";
 import SceneEnv from "../../components/env/environment";
-import {
-  ColorAverage,
-  EffectComposer,
-  Noise,
-  Vignette,
-} from "@react-three/postprocessing";
+import { EffectComposer } from "@react-three/postprocessing";
 import { CircularTransition } from "../../components/postprocessing/effects/CircularTransition";
-import GreenPass from "../../components/postprocessing/effects/Green.test";
-import GreenEffect from "../../components/postprocessing/effects/Green.test";
-import { WebGPURenderer } from "three/webgpu";
-import type { WebGPURendererParameters } from "three/src/renderers/webgpu/WebGPURenderer.js";
-import { SimpleCheckNormalEffect } from "../../components/postprocessing/effects/simplecheck.test";
-import { ASCII } from "../../components/postprocessing/effects/Ascii.test";
-import { MyEffectComposer } from "../../components/postprocessing/effects/composer";
-import { ASCIIEffect } from "../../components/postprocessing/effects/ascii";
-import Graniet from "../../components/gradient/graniet";
+import Snapshot from "../../components/snapshot";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -113,69 +100,49 @@ type FBOCaptureProps = {
   onFBO: (texture: THREE.Texture) => void;
 };
 
-const FBOCapture = ({
-  sceneARef,
-  sceneBRef,
-  tempRef,
-  mode,
-  onFBO,
-}: FBOCaptureProps) => {
-  // const { gl, scene, camera } = useThree();
-  // const fbo = useFBO(256, 256);
+const FBOCapture = ({ sceneARef, sceneBRef, mode, onFBO }: FBOCaptureProps) => {
+  const { gl, scene, camera, size } = useThree();
 
-  // useFrame(() => {
-  //   const groupA = sceneARef.current;
-  //   const groupB = sceneBRef.current;
-  //   if (!groupA || !groupB || !tempRef.current) return;
+  const fboSize = useMemo(() => {
+    const w = Math.min(size.width, 1024);
+    const h = (w * size.height) / size.width;
+    return { w, h };
+  }, [size]);
 
-  //   tempRef.current.visible = false;
-
-  //   // If Current Scene Is A Then;
-  //   if (mode == "A") {
-  //     // Only Render Scene A;
-  //     groupA.visible = true;
-  //     groupB.visible = false;
-  //     gl.setRenderTarget(null);
-  //   } else if (mode == "B") {
-  //     // Only Render Scene B;
-  //     groupB.visible = true;
-  //     groupA.visible = false;
-  //     gl.setRenderTarget(null);
-  //   } else if (mode == "TransitionToB") {
-  //     groupA.visible = false;
-  //     groupB.visible = true;
-
-  //     gl.setRenderTarget(fbo);
-  //     gl.clearColor(); // ← clear color buffer
-  //     gl.clearDepth(); // ← clear depth buffer
-  //     gl.render(scene, camera);
-  //     gl.setRenderTarget(null);
-
-  //     groupA.visible = true;
-  //     groupB.visible = false;
-  //     tempRef.current.visible = true;
-  //   } else if (mode == "TransitionToA") {
-  //     groupA.visible = true;
-  //     groupB.visible = false;
-
-  //     gl.setRenderTarget(fbo);
-  //     gl.clearColor(); // ← clear color buffer
-  //     gl.clearDepth(); // ← clear depth buffer
-  //     gl.render(scene, camera);
-  //     gl.setRenderTarget(null);
-
-  //     groupA.visible = false;
-  //     groupB.visible = true;
-  //     tempRef.current.visible = true;
-  //   }
-
-  //   tempRef.current.children[0].material.map = fbo.texture;
-  //   onFBO(fbo.texture);
-  // }, 1); // runs before default render
+  const fbo = useFBO(fboSize.w, fboSize.h, { samples: 4 });
 
   useFrame(() => {
-    if (!tempRef.current) return;
-  });
+    const groupA = sceneARef.current;
+    const groupB = sceneBRef.current;
+    if (!groupA || !groupB) return;
+
+    const isTransitioning = mode === "TransitionToB" || mode === "TransitionToA";
+
+    if (!isTransitioning) {
+      // Simple visibility swap — no FBO render needed
+      groupA.visible = mode === "A";
+      groupB.visible = mode === "B";
+      return; // ← skip FBO work entirely
+    }
+
+    // Determine which scene goes into FBO (the "incoming" scene)
+    const incomingIsB = mode === "TransitionToB";
+
+    groupA.visible = !incomingIsB;
+    groupB.visible = incomingIsB;
+
+    // Render incoming scene into FBO
+    gl.setRenderTarget(fbo);
+    gl.clear(); // clears color + depth + stencil
+    gl.render(scene, camera);
+    gl.setRenderTarget(null);
+
+    // Restore — outgoing scene stays visible for the default R3F render pass
+    groupA.visible = incomingIsB;
+    groupB.visible = !incomingIsB;
+
+    onFBO(fbo.texture);
+  }, -1); // ← negative priority = runs BEFORE R3F's default render
 
   return null;
 };
@@ -201,7 +168,6 @@ const SceneRenderer = ({
   // Only used in transition mode — safe because this ref is just a plain object
   const sceneARef = useRef<THREE.Group | null>(null);
   const sceneBRef = useRef<THREE.Group | null>(null);
-  const tempRef = useRef(null);
 
   const initVisibleA = useMemo(() => mode == "A", []);
   const initVisibleB = useMemo(() => mode == "B", []);
@@ -229,15 +195,14 @@ const SceneRenderer = ({
       </group>
 
       {/* FBOCapture only mounts here — useFBO/useFrame never run in A or B mode */}
-      {/* {onFBO && (
+      {onFBO && (
         <FBOCapture
           mode={mode}
           sceneARef={sceneARef}
           sceneBRef={sceneBRef}
-          tempRef={tempRef}
           onFBO={onFBO}
         />
-      )} */}
+      )}
     </>
   );
 };
@@ -343,14 +308,13 @@ const Experience = ({ mode = "A", onFBO }: ExperienceProps) => {
     scale: scale2,
   };
 
-  const fbo = useRef(null);
-
-  const asciiEffect = useMemo(() => new ASCIIEffect(), []);
+  const fbo = useRef<THREE.Texture | null>(null);
 
   return (
     <>
       <Leva hidden collapsed />
       <Canvas
+        gl={{ preserveDrawingBuffer: true }}
         className="canvas-scene"
         // gl={async (props) => {
         //   console.warn("WebGPU is supported");
@@ -361,19 +325,22 @@ const Experience = ({ mode = "A", onFBO }: ExperienceProps) => {
         //   return renderer;
         // }}
       >
-        {/* <Stats /> */}
-        <CameraControls />
+        {/* For Taking Snapshot */}
+        <Snapshot />
+        <Stats />
+        {/* <CameraControls /> */}
         <SceneRenderer
           mode={mode}
           mouse={mouse}
           transformA={transformA}
           transformB={transformB}
-          onFBO={(t) => {
-            // fbo.current = t;
+          onFBO={(t: THREE.Texture) => {
+            fbo.current = t;
           }}
         />
 
-        {/* <Graniet colorA={"#000000"} colorB={"#2800c7"} colorC={"#00b5f2"} /> */}
+        {/* <Arm1 /> */}
+        {/* <Graniet colorA={"#aaabae"} colorB={"lightpink"} colorC={"gray"} /> */}
 
         {/* <SceneEnv background /> */}
 
@@ -383,15 +350,13 @@ const Experience = ({ mode = "A", onFBO }: ExperienceProps) => {
         </mesh> */}
 
         <EffectComposer>
+          <CircularTransition fbo={fbo} progress={0.5} />
+          {/* <Pixelation /> */}
           {/* <Noise opacity={0.01 } /> */}
           {/* <ASCII /> */}
           {/* <GreenEffect /> */}
           {/* <primitive object={asciiEffect} /> */}
         </EffectComposer>
-
-        {/* <EffectComposer>
-          <GreenEffect />
-        </EffectComposer> */}
       </Canvas>
     </>
   );

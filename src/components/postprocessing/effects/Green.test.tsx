@@ -6,8 +6,10 @@ import { BlendFunction } from "postprocessing";
 const fragmentShader = `
 void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
   
-  outputColor = vec4(vec3(dot(inputColor.rgb,vec3(.3,.78,.56))),1.0);
-
+  vec3 eyeVector = vec3(.3,.78,.56);
+  vec3 colorVector = inputColor.rgb;
+  float dotted = dot(colorVector,eyeVector);
+  outputColor = vec4(vec3(dotted),1.0);
 }
 `;
 
@@ -22,6 +24,5 @@ class GreenEffectImpl extends Effect {
 
 const GreenEffect = wrapEffect(GreenEffectImpl);
 
-extend({ GreenEffect })
 
 export default GreenEffect;

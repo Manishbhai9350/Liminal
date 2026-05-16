@@ -1,12 +1,9 @@
-import "./transition.css";
 import { Canvas } from "@react-three/fiber";
-import TransitionScene from "./components/scene";
-import { WebGPURenderer } from "three/webgpu";
-import { CameraControls, OrbitControls } from "@react-three/drei";
+import Graniet from "../../components/gradient/graniet";
 
-const TransitionPage = () => {
+const GradientPage = () => {
   return (
-    <div className="transition-page">
+    <div className="gradient-page">
       <Canvas
         // gl={async (props) => {
         //   const renderer = new WebGPURenderer(props);
@@ -15,10 +12,10 @@ const TransitionPage = () => {
         // }}
       >
         {/* <OrbitControls makeDefault /> */}
-        <TransitionScene />
+        <Graniet colorA={"#aaabae"} colorB={"lightpink"} colorC={"gray"} />
       </Canvas>
     </div>
   );
 };
 
-export default TransitionPage;
+export default GradientPage;

@@ -63,74 +63,77 @@ const Graniet = ({
 
   const mouse = useThree((state) => state.mouse);
 
-  const controls = useControls("Graniet Controlrs "+colorB, {
-    timeSpeed: { value: 0.4, min: 0, max: 5, step: 0.01 },
-    colorBalance: { value: 0.0, min: -1, max: 1, step: 0.01 },
+  const controls = useControls(
+    "Graniet Controlrs " + colorB,
+    {
+      color1: colorA,
+      color2: colorB,
+      color3: colorC,
 
-    warpStrength: { value: 1.0, min: 0, max: 10, step: 0.01 },
-    warpFrequency: { value: 5.0, min: 0, max: 20, step: 0.1 },
-    warpSpeed: { value: 2.0, min: 0, max: 10, step: 0.01 },
-    warpAmplitude: { value: 50.0, min: 0, max: 200, step: 1 },
+      timeSpeed: { value: 0.4, min: 0, max: 5, step: 0.01 },
+      colorBalance: { value: 0.0, min: -1, max: 1, step: 0.01 },
 
-    blendAngle: { value: 0.0, min: 0, max: Math.PI * 2, step: 0.01 },
-    blendSoftness: { value: 0.05, min: 0, max: 1, step: 0.01 },
+      warpStrength: { value: 1.0, min: 0, max: 10, step: 0.01 },
+      warpFrequency: { value: 5.0, min: 0, max: 20, step: 0.1 },
+      warpSpeed: { value: 2.0, min: 0, max: 10, step: 0.01 },
+      warpAmplitude: { value: 50.0, min: 0, max: 200, step: 1 },
 
-    rotationAmount: { value: 500.0, min: 0, max: 1000, step: 1 },
+      blendAngle: { value: 0.0, min: 0, max: Math.PI * 2, step: 0.01 },
+      blendSoftness: { value: 0.05, min: 0, max: 1, step: 0.01 },
 
-    noiseScale: { value: 2.0, min: 0, max: 10, step: 0.1 },
+      rotationAmount: { value: 500.0, min: 0, max: 1000, step: 1 },
 
-    grainAmount: { value: 0.1, min: 0, max: 1, step: 0.01 },
-    grainScale: { value: 2.0, min: 0, max: 10, step: 0.1 },
-    grainAnimated: false,
+      noiseScale: { value: 2.0, min: 0, max: 10, step: 0.1 },
 
-    contrast: { value: 1.5, min: 0, max: 3, step: 0.01 },
-    gamma: { value: 1.0, min: 0, max: 3, step: 0.01 },
-    saturation: { value: 1.0, min: 0, max: 3, step: 0.01 },
+      grainAmount: { value: 0.1, min: 0, max: 1, step: 0.01 },
+      grainScale: { value: 2.0, min: 0, max: 10, step: 0.1 },
+      grainAnimated: false,
 
-    centerX: { value: 0.0, min: -1, max: 1, step: 0.01 },
-    centerY: { value: 0.0, min: -1, max: 1, step: 0.01 },
-    zoom: { value: 0.9, min: 0.1, max: 3, step: 0.01 },
+      contrast: { value: 1.5, min: 0, max: 3, step: 0.01 },
+      gamma: { value: 1.0, min: 0, max: 3, step: 0.01 },
+      saturation: { value: 1.0, min: 0, max: 3, step: 0.01 },
 
-    color1: colorA,
-    color2: colorB,
-    color3: colorC,
-  }, {
-    collapsed:true
+      centerX: { value: 0.0, min: -1, max: 1, step: 0.01 },
+      centerY: { value: 0.0, min: -1, max: 1, step: 0.01 },
+      zoom: { value: 0.9, min: 0.1, max: 3, step: 0.01 },
+    },
+    {
+      collapsed: true,
+    },
+  );
+
+  useFrame((state) => {
+    if (!MatRef.current) return;
+
+    const mat = MatRef.current;
+
+    mat.iTime = state.clock.elapsedTime + offsetTime;
+
+    mat.uTimeSpeed = controls.timeSpeed;
+    mat.uColorBalance = controls.colorBalance;
+
+    mat.uWarpStrength = controls.warpStrength;
+    mat.uWarpFrequency = controls.warpFrequency;
+    mat.uWarpSpeed = controls.warpSpeed;
+    mat.uWarpAmplitude = controls.warpAmplitude;
+
+    mat.uBlendAngle = controls.blendAngle;
+    mat.uBlendSoftness = controls.blendSoftness;
+
+    mat.uRotationAmount = controls.rotationAmount;
+
+    mat.uNoiseScale = controls.noiseScale;
+
+    mat.uGrainAmount = controls.grainAmount;
+    mat.uGrainScale = controls.grainScale;
+    mat.uGrainAnimated = controls.grainAnimated ? 1.0 : 0.0;
+
+    mat.uContrast = controls.contrast;
+    mat.uGamma = controls.gamma;
+    mat.uSaturation = controls.saturation;
+
+    mat.uZoom = controls.zoom;
   });
-
-  useFrame(
-    (state) => {
-      if (!MatRef.current) return;
-
-      const mat = MatRef.current;
-
-      mat.iTime = state.clock.elapsedTime + offsetTime;
-
-      mat.uTimeSpeed = controls.timeSpeed;
-      mat.uColorBalance = controls.colorBalance;
-
-      mat.uWarpStrength = controls.warpStrength;
-      mat.uWarpFrequency = controls.warpFrequency;
-      mat.uWarpSpeed = controls.warpSpeed;
-      mat.uWarpAmplitude = controls.warpAmplitude;
-
-      mat.uBlendAngle = controls.blendAngle;
-      mat.uBlendSoftness = controls.blendSoftness;
-
-      mat.uRotationAmount = controls.rotationAmount;
-
-      mat.uNoiseScale = controls.noiseScale;
-
-      mat.uGrainAmount = controls.grainAmount;
-      mat.uGrainScale = controls.grainScale;
-      mat.uGrainAnimated = controls.grainAnimated ? 1.0 : 0.0;
-
-      mat.uContrast = controls.contrast;
-      mat.uGamma = controls.gamma;
-      mat.uSaturation = controls.saturation;
-
-      mat.uZoom = controls.zoom;
-    });
 
   const camera = useThree((v) => v.camera as PerspectiveCamera);
 

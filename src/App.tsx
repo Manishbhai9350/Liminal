@@ -4,7 +4,6 @@ import { SplitText } from "gsap/SplitText";
 import { ScrollProvider } from "./components/scroll/scroll.provider";
 import Experience from "./scene/components/Experience";
 import { useRoute } from "./utils/route";
-import TransitionPage from "./experiment/transition";
 import { SCENE_CONFIG } from "./config/scene.config";
 import type { SnapZone } from "./components/scroll/scroll.engine";
 import { useControls } from "leva";
@@ -64,7 +63,7 @@ const App = () => {
 
   const { mode } = useControls({
     mode:{
-      value:'A',
+      value:'TransitionToB',
       options:['A','B','TransitionToA','TransitionToB']
     }
   })
@@ -79,13 +78,13 @@ const App = () => {
       >
         <div className="bg"></div>
         <main className="app">
-          {/* <UI /> */}
+          <UI />
+          {/* <h1 className="creative-dev">Creative &nbsp; Developer</h1> */}
+          <button className="snapshot">Snapshot</button>
           <Experience mode={mode} />
         </main>
       </ScrollProvider>
     );
-  } else if (path === "/transition") {
-    return <TransitionPage />;
   }
 };
 

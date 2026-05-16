@@ -8,7 +8,6 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import TransitionMaterial from "../../experiment/components/transition.material";
 
 const FALLBACK_BG = 0x0a1a40;
 
