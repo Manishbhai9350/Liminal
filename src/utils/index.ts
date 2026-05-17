@@ -3,7 +3,7 @@ import gsap from "gsap";
 
 const DefualtVars: SplitText.Vars = {
   type: "words, lines",
-  mask: "lines"
+  mask: "lines",
 };
 
 export const SplitIt = (elem: gsap.DOMTarget, vars?: SplitText.Vars) => {
@@ -19,12 +19,19 @@ export const setDomOverflow = (document: Document, overflow: string) => {
   // document.body.setAttribute("data-lenis-prevent", overflow == "hidden" ?  "true" : "");
 };
 
-
 export const getSectionProgress = (
   global: number,
   start: number,
-  end: number
-)  => {
+  end: number,
+) => {
   const clamped = Math.min(Math.max(global - start, 0), end - start);
   return clamped / (end - start);
-}
+};
+
+export const InRange = (value: number, min: number, max: number) =>
+  value >= min && value <= max;
+
+export const InBounds = (value: number, bounds: number[]) =>
+  bounds.some(
+    (_, i) => i % 2 === 0 && InRange(value, bounds[i], bounds[i + 1]),
+  );

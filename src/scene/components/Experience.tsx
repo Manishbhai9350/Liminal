@@ -2,13 +2,14 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useFBO, Stats } from "@react-three/drei";
 import * as THREE from "three";
 import { Leva, useControls } from "leva";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import HandScene from "./scene";
 import SceneEnv from "../../components/env/environment";
 import { EffectComposer } from "@react-three/postprocessing";
 import { CircularTransition } from "../../components/postprocessing/effects/CircularTransition";
 import Snapshot from "../../components/snapshot";
+import { useScroll } from "../../components/scroll/useScroll";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -111,38 +112,63 @@ const FBOCapture = ({ sceneARef, sceneBRef, mode, onFBO }: FBOCaptureProps) => {
 
   const fbo = useFBO(fboSize.w, fboSize.h, { samples: 4 });
 
+  const isTransitioning = useMemo(
+    () => mode === "TransitionToB" || mode === "TransitionToA",
+    [mode],
+  );
+
   useFrame(() => {
+    if(mode == 'A') return;
     const groupA = sceneARef.current;
     const groupB = sceneBRef.current;
     if (!groupA || !groupB) return;
 
-    const isTransitioning = mode === "TransitionToB" || mode === "TransitionToA";
+    // Always capture Scene B into FBO
+    groupA.visible = false;
+    groupB.visible = true;
 
-    if (!isTransitioning) {
-      // Simple visibility swap — no FBO render needed
-      groupA.visible = mode === "A";
-      groupB.visible = mode === "B";
-      return; // ← skip FBO work entirely
-    }
-
-    // Determine which scene goes into FBO (the "incoming" scene)
-    const incomingIsB = mode === "TransitionToB";
-
-    groupA.visible = !incomingIsB;
-    groupB.visible = incomingIsB;
-
-    // Render incoming scene into FBO
     gl.setRenderTarget(fbo);
-    gl.clear(); // clears color + depth + stencil
+    gl.clear();
     gl.render(scene, camera);
     gl.setRenderTarget(null);
 
-    // Restore — outgoing scene stays visible for the default R3F render pass
-    groupA.visible = incomingIsB;
-    groupB.visible = !incomingIsB;
+    // Restore — Scene A always renders to screen by default
+    groupA.visible = true;
+    groupB.visible = false;
 
     onFBO(fbo.texture);
-  }, -1); // ← negative priority = runs BEFORE R3F's default render
+  }, -1);
+
+  // useFrame(() => {
+  //   const groupA = sceneARef.current;
+  //   const groupB = sceneBRef.current;
+  //   if (!groupA || !groupB) return;
+
+  //   if (!isTransitioning) {
+  //     // Simple visibility swap — no FBO render needed
+  //     groupA.visible = mode === "A";
+  //     groupB.visible = mode === "B";
+  //     return; // ← skip FBO work entirely
+  //   }
+
+  //   // Determine which scene goes into FBO (the "incoming" scene)
+  //   const incomingIsB = mode === "TransitionToB";
+
+  //   groupA.visible = !incomingIsB;
+  //   groupB.visible = incomingIsB;
+
+  //   // Render incoming scene into FBO
+  //   gl.setRenderTarget(fbo);
+  //   gl.clear(); // clears color + depth + stencil
+  //   gl.render(scene, camera);
+  //   gl.setRenderTarget(null);
+
+  //   // Restore — outgoing scene stays visible for the default R3F render pass
+  //   groupA.visible = incomingIsB;
+  //   groupB.visible = !incomingIsB;
+
+  //   onFBO(fbo.texture);
+  // }, -1); // ← negative priority = runs BEFORE R3F's default render
 
   return null;
 };
@@ -230,7 +256,7 @@ export const TempMesh = () => {
   );
 };
 
-const Experience = ({ mode = "A", onFBO }: ExperienceProps) => {
+const Experience = ({ mode = "A" }: ExperienceProps) => {
   const {
     posX,
     posY,
@@ -310,11 +336,17 @@ const Experience = ({ mode = "A", onFBO }: ExperienceProps) => {
 
   const fbo = useRef<THREE.Texture | null>(null);
 
+  const isTransitioning = useMemo(
+    () => mode == "TransitionToA" || mode == "TransitionToB",
+    [mode],
+  );
+
   return (
     <>
       <Leva hidden collapsed />
       <Canvas
-        gl={{ preserveDrawingBuffer: true }}
+        dpr={[1, 1.5]}
+        // gl={{ preserveDrawingBuffer: true }}
         className="canvas-scene"
         // gl={async (props) => {
         //   console.warn("WebGPU is supported");
@@ -349,13 +381,13 @@ const Experience = ({ mode = "A", onFBO }: ExperienceProps) => {
           <meshStandardMaterial />
         </mesh> */}
 
-        <EffectComposer>
-          <CircularTransition fbo={fbo} progress={0.5} />
-          {/* <Pixelation /> */}
-          {/* <Noise opacity={0.01 } /> */}
-          {/* <ASCII /> */}
-          {/* <GreenEffect /> */}
-          {/* <primitive object={asciiEffect} /> */}
+        {/* {isTransitioning && (
+          <EffectComposer>
+            <CircularTransition fbo={fbo} progress={0.5} />
+          </EffectComposer>
+        )} */}
+        <EffectComposer  >
+          <CircularTransition fbo={fbo} />
         </EffectComposer>
       </Canvas>
     </>

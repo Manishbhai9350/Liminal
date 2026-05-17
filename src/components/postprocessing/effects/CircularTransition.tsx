@@ -9,6 +9,8 @@ import {
 } from "react";
 import { useThree } from "@react-three/fiber";
 import { useScroll } from "../../scroll/useScroll";
+import { InBounds } from "../../../utils";
+import { SCENE_BOUNDS } from "../../../config/scene.config";
 
 // ─── Shader ───────────────────────────────────────────────────────────────────
 
@@ -16,6 +18,7 @@ const CircularTransitionShader = {
   fragmentShader: /* glsl */ `
     #define PI 3.141592653589793
 
+    uniform float uSwap;
     uniform sampler2D uMap;
     uniform float uProgress;
     uniform float uWaveSize;
@@ -40,15 +43,20 @@ const CircularTransitionShader = {
       return uv;
     }
 
+
     void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
       float prog = uProgress;
-      float progress = cubicIn(prog) * 1.3;
+      float progress = cubicIn(prog * 1.41);
       float aspect = uResolution.x / uResolution.y;
 
       if (progress <= 0.0) {
         outputColor = inputColor;
         return;
       }
+
+      // Swap scenes based on direction
+      vec4 sceneA = uSwap < 0.5 ? inputColor : texture2D(uMap, uv);
+      vec4 sceneB = uSwap < 0.5 ? texture2D(uMap, uv) : inputColor;
 
       vec2 centeredUV = (uv - 0.5) * vec2(aspect, 1.0);
       float time = uTime * 2.5;
@@ -58,31 +66,33 @@ const CircularTransitionShader = {
 
       float height = 0.7;
 
-      // Scene 1 — re-sample inputBuffer at distorted UV
+      // Scene 1 — distorted UV resample
       vec2 uv1 = Mul(uv, 1.0 - (circleWave + wave) * height);
-      vec3 tDiffuse1 = texture2D(inputBuffer, uv1).rgb;
+      vec3 tDiffuse1 = uSwap < 0.5
+        ? texture2D(inputBuffer, uv1).rgb
+        : texture2D(uMap, uv1).rgb;
 
-      // Scene 2 — incoming FBO (uMap)
+      // Scene 2 — incoming
       float circleMask = Circle(centeredUV, 0.075 * progress, progress - uMaskRadius);
       float circleInnerDistortion = Circle(centeredUV, 0.25 * progress, progress - uMaskRadius);
       vec2 uv2 = Mul(uv, 1.0 + (uInnerDistortion - circleInnerDistortion * uInnerDistortion));
-      vec3 tDiffuse2 = texture2D(uMap, uv2).rgb;
+      vec3 tDiffuse2 = uSwap < 0.5
+        ? texture2D(uMap, uv2).rgb
+        : texture2D(inputBuffer, uv2).rgb;
 
       vec3 color = mix(tDiffuse1, tDiffuse2, circleMask);
 
-      // uWaveGlow = 1.0;
-
-      // Wave glow
       float waveColor = wave * uWaveGlow * (1.0 - Circle(centeredUV, 0.1, progress - 0.1));
       color += waveColor;
 
-      // Inner shadow
       color *= 1.0 - 0.7 * clamp(
         0.0, 1.0,
         circleMask - Circle(centeredUV + vec2(-0.1, 0.1) * progress, 0.175 * progress, progress - uMaskRadius)
       );
 
       outputColor = vec4(color, inputColor.a);
+
+      outputColor = inputColor;
     }
   `,
 };
@@ -104,6 +114,7 @@ export class CircularTransitionEffect extends Effect {
     super("CircularTransitionEffect", CircularTransitionShader.fragmentShader, {
       blendFunction,
       uniforms: new Map<string, THREE.Uniform<any>>([
+        ["uSwap", new THREE.Uniform(0)],
         ["uMap", new THREE.Uniform(null)],
         ["uProgress", new THREE.Uniform(0)],
         ["uResolution", new THREE.Uniform(resolution)],
@@ -174,22 +185,27 @@ export const CircularTransition = forwardRef<
 
   useEffect(() => {
     const update = (p) => {
-      const uProgress = THREE.MathUtils.mapLinear(
-        THREE.MathUtils.clamp(p.progress, 0.1, 0.3),
-        0.1,
-        0.3,
-        0,
-        1,
-      );
+      const prog = p.progress;
+      let uProgress = 0;
+      let uSwap = 0;
+
+      if (InBounds(prog, [0.1, 0.3])) {
+        uProgress = THREE.MathUtils.mapLinear(prog, 0.1, 0.3, 0, 1);
+        uSwap = 0; // A → B: inputColor=A, uMap=B
+      } else if (InBounds(prog, [0.7, 0.9])) {
+        uProgress = THREE.MathUtils.mapLinear(prog, 0.7, 0.9, 0, 1);
+        uSwap = 1; // B → A: swap them
+      } else if (InBounds(prog, SCENE_BOUNDS.A)) {
+        uProgress = 0;
+      } else if (InBounds(prog, SCENE_BOUNDS.B)) {
+        uProgress = 1;
+      }
+
       effect.uniforms.get("uProgress")!.value = uProgress;
+      effect.uniforms.get("uSwap")!.value = uSwap;
     };
-
     scroll.on("update", update);
-
-    return () => {
-      scroll.off("update", update);
-    };
+    return () => scroll.off("update", update);
   }, []);
-
   return <primitive ref={ref} object={effect} dispose={null} />;
 });

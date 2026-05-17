@@ -1,19 +1,9 @@
 
 
-
-
-// Original
-// export const SCENE_CONFIG = {
-//     sceneA: {
-//         startProg: .25, 
-//         endProg: .45
-//     },
-//     sceneB: {
-//         startProg: .55, 
-//         endProg: .75
-//     }
-// }
-
+export const SCENE_BOUNDS = {
+  A: [0.0,0.1,0.9,1.0],
+  B: [0.3,0.7],
+}
 
 export const SCENE_CONFIG = {
   sceneA_fadeOut: { startProg: 0.0,  endProg: 0.1  }, // fade out sceneA
