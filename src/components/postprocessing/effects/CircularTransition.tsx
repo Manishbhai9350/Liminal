@@ -92,7 +92,7 @@ const CircularTransitionShader = {
 
       outputColor = vec4(color, inputColor.a);
 
-      outputColor = inputColor;
+      // outputColor = inputColor;
     }
   `,
 };
