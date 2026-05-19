@@ -11,90 +11,15 @@ import { useThree } from "@react-three/fiber";
 import { useScroll } from "../../scroll/useScroll";
 import { InBounds } from "../../../utils";
 import { SCENE_BOUNDS } from "../../../config/scene.config";
+import circularTransitionShader from "../shaders/transition.glsl";
+import { useLoader } from "../../../hooks/useLoader";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 
 // ─── Shader ───────────────────────────────────────────────────────────────────
 
 const CircularTransitionShader = {
-  fragmentShader: /* glsl */ `
-    #define PI 3.141592653589793
-
-    uniform float uSwap;
-    uniform sampler2D uMap;
-    uniform float uProgress;
-    uniform float uWaveSize;
-    uniform float uInnerDistortion;
-    uniform float uWaveGlow;
-    uniform float uMaskRadius;
-    uniform float uTime;
-    uniform vec2 uResolution;
-
-    float cubicIn(float t) {
-      return t * t;
-    }
-
-    float Circle(vec2 uv, float threshold, float radius) {
-      return smoothstep(threshold, 0.0, length(uv) - radius + threshold);
-    }
-
-    vec2 Mul(vec2 uv, float value) {
-      uv -= 0.5;
-      uv *= value;
-      uv += 0.5;
-      return uv;
-    }
-
-
-    void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
-      float prog = uProgress;
-      float progress = cubicIn(prog * 1.41);
-      float aspect = uResolution.x / uResolution.y;
-
-      if (progress <= 0.0) {
-        outputColor = inputColor;
-        return;
-      }
-
-      // Swap scenes based on direction
-      vec4 sceneA = uSwap < 0.5 ? inputColor : texture2D(uMap, uv);
-      vec4 sceneB = uSwap < 0.5 ? texture2D(uMap, uv) : inputColor;
-
-      vec2 centeredUV = (uv - 0.5) * vec2(aspect, 1.0);
-      float time = uTime * 2.5;
-
-      float circleWave = Circle(centeredUV, 0.3, progress);
-      float wave = circleWave * smoothstep(0.0, 2.0, abs(sin(time + circleWave * PI * 3.0)));
-
-      float height = 0.7;
-
-      // Scene 1 — distorted UV resample
-      vec2 uv1 = Mul(uv, 1.0 - (circleWave + wave) * height);
-      vec3 tDiffuse1 = uSwap < 0.5
-        ? texture2D(inputBuffer, uv1).rgb
-        : texture2D(uMap, uv1).rgb;
-
-      // Scene 2 — incoming
-      float circleMask = Circle(centeredUV, 0.075 * progress, progress - uMaskRadius);
-      float circleInnerDistortion = Circle(centeredUV, 0.25 * progress, progress - uMaskRadius);
-      vec2 uv2 = Mul(uv, 1.0 + (uInnerDistortion - circleInnerDistortion * uInnerDistortion));
-      vec3 tDiffuse2 = uSwap < 0.5
-        ? texture2D(uMap, uv2).rgb
-        : texture2D(inputBuffer, uv2).rgb;
-
-      vec3 color = mix(tDiffuse1, tDiffuse2, circleMask);
-
-      float waveColor = wave * uWaveGlow * (1.0 - Circle(centeredUV, 0.1, progress - 0.1));
-      color += waveColor;
-
-      color *= 1.0 - 0.7 * clamp(
-        0.0, 1.0,
-        circleMask - Circle(centeredUV + vec2(-0.1, 0.1) * progress, 0.175 * progress, progress - uMaskRadius)
-      );
-
-      outputColor = vec4(color, inputColor.a);
-
-      // outputColor = inputColor;
-    }
-  `,
+  fragmentShader: circularTransitionShader,
 };
 
 // ─── Effect Class ─────────────────────────────────────────────────────────────
@@ -114,6 +39,9 @@ export class CircularTransitionEffect extends Effect {
     super("CircularTransitionEffect", CircularTransitionShader.fragmentShader, {
       blendFunction,
       uniforms: new Map<string, THREE.Uniform<any>>([
+        ["uLoaderColor", new THREE.Uniform(new THREE.Color("#111"))],
+        ["uLoaded", new THREE.Uniform(0)],
+        ["uLoadProg", new THREE.Uniform(0)],
         ["uSwap", new THREE.Uniform(0)],
         ["uMap", new THREE.Uniform(null)],
         ["uProgress", new THREE.Uniform(0)],
@@ -180,6 +108,33 @@ export const CircularTransition = forwardRef<
   useEffect(() => {
     effect.uniforms.get("uResolution")!.value.set(size.width, size.height);
   }, [size, effect]);
+
+  const loader = useLoader();
+
+  useGSAP(() => {
+    if (!loader.entered) return;
+
+    // proxy object so GSAP has a plain value to tween
+    const proxy = { value: 0 };
+
+    const tween = gsap.to(proxy, {
+      value: 1,
+      duration: 1.2,
+      ease: "power3.in",
+      onUpdate() {
+        effect.uniforms.get("uLoadProg")!.value = proxy.value;
+      },
+      onComplete() {
+        effect.uniforms.get("uLoaded")!.value = 1;
+        loader.setRevealed(true)
+      },
+    });
+
+    // kill the tween if the component unmounts mid-animation
+    return () => {
+      tween.kill();
+    };
+  }, [loader.entered, effect]);
 
   const scroll = useScroll();
 

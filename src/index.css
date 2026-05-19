@@ -103,7 +103,7 @@ main.app {
 }
 
 .snapshot {
-  /* display: none; */
+  display: none;
   width: 80px;
   height: 30px;
   background: rgba(255, 255, 255, 0.792);
@@ -246,6 +246,14 @@ main.app {
       }
     }
  }
+}
+
+.loader {
+  width:100vw;
+  height:100vh;
+  position:absolute;
+  top:0;
+  left:0;
 }
 
 @media (max-width: 900px) {

@@ -7,13 +7,15 @@ import { useRoute } from "./utils/route";
 import { SCENE_CONFIG } from "./config/scene.config";
 import type { SnapZone } from "./components/scroll/scroll.engine";
 import { useControls } from "leva";
-import { useEffect, useState } from "react";
-import { useScroll } from "./components/scroll/useScroll";
-import { InRange } from "./utils";
+import { useState } from "react";
 import { ScrollUpdate } from "./components/scroll.update";
+import Loader from "./components/loader/Loader";
+import { LoaderProvider } from "./context/loader.context";
 
 gsap.registerPlugin(SplitText);
 const App = () => {
+  const [Entered, setEntered] = useState(false);
+
   const path = useRoute();
 
   const snapConfig: SnapZone[] = [
@@ -38,7 +40,7 @@ const App = () => {
       start: SCENE_CONFIG.sceneB_fadeOut.startProg,
       end: SCENE_CONFIG.sceneB_fadeOut.endProg,
       pin: "start",
-      snapIdleMs: 1000,
+      snapIdleMs: 100,
       lerp: 0.03, // slower snap animation
       lerpFn: (cur, tgt, f) => cur + (tgt - cur) * f, // plain linear lerp
     },
@@ -46,7 +48,7 @@ const App = () => {
       start: SCENE_CONFIG.sceneB_fadeIn.startProg,
       end: SCENE_CONFIG.sceneB_fadeIn.endProg,
       pin: "end",
-      snapIdleMs: 1000,
+      snapIdleMs: 100,
       lerp: 0.03, // slower snap animation
       lerpFn: (cur, tgt, f) => cur + (tgt - cur) * f, // plain linear lerp
     },
@@ -54,13 +56,13 @@ const App = () => {
       start: SCENE_CONFIG.transitionAtoB.startProg,
       end: SCENE_CONFIG.transitionAtoB.endProg,
       lerp: 0.05,
-      snapIdleMs: 500,
+      snapIdleMs: 1500,
     },
     {
       start: SCENE_CONFIG.transitionBtoA.startProg,
       end: SCENE_CONFIG.transitionBtoA.endProg,
       lerp: 0.05,
-      snapIdleMs: 500,
+      snapIdleMs: 1500,
     },
   ];
 
@@ -73,24 +75,29 @@ const App = () => {
 
   const [Mode, setMode] = useState<SceneMode>("A");
 
-
   if (path === "/") {
     return (
-      <ScrollProvider
-        paused={true}
-        // snapConfig={snapConfig}
-        // snapIdleMs={1000}
-        max={innerHeight * 10}
-      >
-        <ScrollUpdate mode={Mode} setMode={setMode} />
-        <div className="bg"></div>
-        <main className="app">
-          <UI />
-          {/* <h1 className="creative-dev">Creative &nbsp; Developer</h1> */}
-          <button className="snapshot">Snapshot</button>
-          <Experience mode={Mode} />
-        </main>
-      </ScrollProvider>
+      <LoaderProvider>
+        <ScrollProvider
+          paused={true}
+          snapConfig={snapConfig}
+          snapIdleMs={2000}
+          max={innerHeight * 10}
+        >
+          <Loader
+            entered={Entered}
+            onEnter={({ withAudio }) => setEntered(true)}
+          />
+          <ScrollUpdate mode={Mode} setMode={setMode} />
+          <div className="bg"></div>
+          <main className="app">
+            <UI />
+            {/* <h1 className="creative-dev">Creative &nbsp; Developer</h1> */}
+            <button className="snapshot">Snapshot</button>
+            <Experience mode={Mode} />
+          </main>
+        </ScrollProvider>
+      </LoaderProvider>
     );
   }
 };

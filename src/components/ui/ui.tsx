@@ -1,9 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DATA } from "../../config/data";
 import Content from "./content";
 import { useScroll } from "../scroll/useScroll";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { useLoader } from "../../hooks/useLoader";
 
 const UI = () => {
   const cursorRef = useRef<HTMLDivElement | null>(null);
@@ -13,13 +14,16 @@ const UI = () => {
 
   const scroller = useScroll();
 
+  const Loader = useLoader();
+
   useEffect(() => {
-    if (LoadedA && LoadedB) {
+    console.log(LoadedA,LoadedB,Loader.revealed)
+    if (LoadedA && LoadedB && Loader.revealed) {
       scroller.resume();
     }
 
     return () => {};
-  }, [LoadedA, LoadedB]);
+  }, [LoadedA, LoadedB, Loader.revealed]);
 
   useGSAP(() => {
     const cursor = cursorRef.current;
@@ -29,7 +33,7 @@ const UI = () => {
 
     const mouseMove = (e: MouseEvent) => {
       // Smooth follow with GSAP
-      gsap.killTweensOf(cursor)
+      gsap.killTweensOf(cursor);
       gsap.to(cursor, {
         x: e.clientX,
         y: e.clientY,

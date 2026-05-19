@@ -5,6 +5,7 @@ import { SplitIt } from "../../utils";
 import gsap from "gsap";
 import { SCENE_CONFIG } from "../../config/scene.config";
 import { useScroll } from "../scroll/useScroll";
+import { useLoader } from "../../hooks/useLoader";
 
 interface ContentProps extends DataType {
   scene: "sceneA" | "sceneB";
@@ -40,9 +41,11 @@ const Content = ({
   const TimelineRef = useRef<gsap.core.Timeline | null>(null);
 
   const scroller = useScroll();
+  const Loader = useLoader();
 
+  // ── scroll-driven animation — only after revealed ─────────
   useEffect(() => {
-    if (!loaded) return;
+    if (!loaded || !Loader.revealed) return;
 
     const update = ({ progress }: { progress: number }) => {
       ProgressRef.current = progress;
@@ -113,9 +116,10 @@ const Content = ({
     return () => {
       scroller.off("update", update);
     };
-  }, [scroller, scene, loaded]);
+  }, [scroller, scene, loaded, Loader.revealed]);
 
   useGSAP(() => {
+    if (!Loader.revealed) return;
     let Timelines: gsap.core.Timeline[] = [];
 
     document.fonts.ready.then(() => {
@@ -178,9 +182,9 @@ const Content = ({
       Timelines.push(HeadingTimeline);
 
       HeadingTimeline.to(SplittedHeadings.words, {
-        delay: scene === "sceneA" ? 0.5 : 0,
         yPercent: 0,
-        stagger: 0.07,
+        stagger: 0.04,
+        duration:.4
       });
       HeadingTimeline.to(SplittedHeadings2.words, {
         yPercent: 0,
@@ -234,7 +238,7 @@ const Content = ({
       gsap.killTweensOf("*");
       Timelines.forEach((T) => T.kill());
     };
-  });
+  }, [Loader.revealed]); // re-runs once when revealed flips to true
 
   return (
     <div ref={ContentRef} className={`content ${scene.toLowerCase()}`}>
