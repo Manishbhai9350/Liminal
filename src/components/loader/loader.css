@@ -1,12 +1,15 @@
 .loader {
+  width: 100vw;
+  height: 100vh;
   position: fixed;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #111;
-  z-index: 1000;
+  z-index: 9999999999999999999;
 }
+
 
 .loader__inner {
   display: flex;
@@ -141,4 +144,10 @@
 
 .loader__enter-silent:hover {
   color: rgba(255, 255, 255, 0.55);
+}
+
+.loader__svg,
+.loader__track,
+.loader__progress {
+  pointer-events: none;
 }

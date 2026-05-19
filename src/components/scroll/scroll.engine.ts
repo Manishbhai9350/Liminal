@@ -5,7 +5,11 @@ type ScrollEvents = {
 type Callback<T> = (data: T) => void;
 
 /** Signature for a custom lerp function. */
-export type LerpFn = (current: number, target: number, factor: number) => number;
+export type LerpFn = (
+  current: number,
+  target: number,
+  factor: number,
+) => number;
 
 export type SnapZone = {
   /** Zone start as a progress value (0–1). */
@@ -130,7 +134,7 @@ export class ScrollEngine {
       } else if (pin === "end") {
         snapPoint = end;
       } else {
-        snapPoint = (progress - start) <= (end - progress) ? start : end;
+        snapPoint = progress - start <= end - progress ? start : end;
       }
 
       return {
@@ -161,12 +165,14 @@ export class ScrollEngine {
   private lastY = 0;
 
   private handleTouchStart = (e: TouchEvent) => {
+    if (this.paused) return;
     e.preventDefault();
     this.markInput();
     this.lastY = e.touches[0].clientY;
   };
 
   private handleTouchMove = (e: TouchEvent) => {
+    if (this.paused) return;
     e.preventDefault();
     this.markInput();
     const y = e.touches[0].clientY;
@@ -245,8 +251,12 @@ export class ScrollEngine {
 
   private init() {
     window.addEventListener("wheel", this.handleWheel, { passive: false });
-    window.addEventListener("touchstart", this.handleTouchStart, { passive: false });
-    window.addEventListener("touchmove", this.handleTouchMove, { passive: false });
+    window.addEventListener("touchstart", this.handleTouchStart, {
+      passive: false,
+    });
+    window.addEventListener("touchmove", this.handleTouchMove, {
+      passive: false,
+    });
     this.loop();
   }
 }

@@ -47,7 +47,7 @@ const CONFIG: Record<"A" | "B", { colors: SceneColors; variant: string }> = {
       colorB: "#b10000",
       colorC: "#000000",
     },
-    variant: "hand2",
+    variant: "hand1",
   },
 };
 
@@ -359,7 +359,7 @@ const Experience = ({ mode = "A" }: ExperienceProps) => {
       >
         {/* For Taking Snapshot */}
         <Snapshot />
-        <Stats />
+        {/* <Stats /> */}
         {/* <CameraControls /> */}
         <SceneRenderer
           mode={mode}

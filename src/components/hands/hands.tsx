@@ -27,7 +27,7 @@ export function Arm1(props: HandProps) {
 
   const baseRotation = new THREE.Euler(0, 0, 0);
 
-  const { maxRotation } = useMaterial(scene,props.color);
+  const { maxRotation } = useMaterial(scene, props.color);
 
   const scroll = useScroll();
 
@@ -88,7 +88,7 @@ export function Arm2(props: HandProps) {
 
   const baseRotation = new THREE.Euler(0, 0.3, 0);
 
-  const { maxRotation } = useMaterial(scene,props.color);
+  const { maxRotation } = useMaterial(scene, props.color);
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
@@ -126,19 +126,132 @@ export function Arm2(props: HandProps) {
 }
 
 export function Hand1(props: HandProps) {
-  const { scene } = useGLTF("/models/actionhand.glb");
+  const { scene, animations } = useGLTF("/models/actionhand.glb");
 
   const groupRef = useRef<THREE.Group>(null!);
   const rotationRef = useRef({ x: 0, y: 0 });
 
-  const baseRotation = new THREE.Euler(0, Math.PI * 0.2, 0);
+  const baseRotation = new THREE.Euler(2.2, 0, 0);
 
-  const { maxRotation } = useMaterial(scene,props.color);
+  const { maxRotation } = useMaterial(scene, props.color);
 
+  const { actions } = useAnimations(animations, groupRef);
+
+  const scroll = useScroll();
+  const base = "kulack";
+  const sequence = ["One", "Rock_finger", "Three"];
+
+  //       "Fuck",
+  //       "GrabHold",
+  //       "GrabRelease",
+  //       "kulack",
+  //       "One",
+  //       "Peace_finger",
+  //       "Rock_finger",
+  //       "Three",
+
+  useEffect(() => {
+    [...sequence, base].forEach((name) => {
+      const action = actions[name];
+      if (action) {
+        action.reset();
+        action.play();
+
+        action.paused = false;
+        action.enabled = true;
+
+        action.setLoop(THREE.LoopRepeat, Infinity);
+
+        // 👇 KEY
+        action.setEffectiveWeight(name === base ? 1 : 0);
+      }
+    });
+  }, [actions]);
+  useEffect(() => {
+    const handleUpdate = (data: { progress: number }) => {
+      const p = data.progress;
+
+      // Split progress into two phases:
+      // [0, 0.3] = base hold + base→first blend
+      // [0.3, 0.7] = sequence blends
+      const BASE_END = 0.3;
+      const SEQ_END = 0.7;
+
+      const count = sequence.length;
+      const blendStart = 0.2;
+      const blendEnd = 0.8;
+
+      // Reset all weights
+      Object.values(actions).forEach((a) => a?.setEffectiveWeight(0));
+
+      const baseAction = actions[base];
+      const firstAction = actions[sequence[0]];
+
+      // Phase 1: pure base or base→first blend
+      if (p < BASE_END) {
+        const localT = p / BASE_END; // 0→1 over this phase
+
+        if (localT < blendStart) {
+          baseAction?.setEffectiveWeight(1);
+          return;
+        }
+
+        const t = THREE.MathUtils.smootherstep(localT, blendStart, blendEnd);
+        baseAction?.setEffectiveWeight(1 - t);
+        firstAction?.setEffectiveWeight(t);
+        if (firstAction) firstAction.time = firstAction.getClip().duration * t;
+        return;
+      }
+
+      // Phase 2: sequence blends
+      const globalT = THREE.MathUtils.clamp(
+        (p - BASE_END) / (SEQ_END - BASE_END),
+        0,
+        0.999,
+      );
+      const segmentSize = 1 / count;
+      const rawIndex = globalT / segmentSize;
+      const index = Math.floor(rawIndex);
+      const localT = rawIndex - index;
+
+      const currName = sequence[index];
+      const nextName = sequence[index + 1];
+      const curr = actions[currName];
+      const next = actions[nextName];
+
+      // Last segment
+      if (!next) {
+        curr?.setEffectiveWeight(1);
+        return;
+      }
+
+      // Hold current
+      if (localT < blendStart) {
+        curr?.setEffectiveWeight(1);
+        return;
+      }
+
+      // Blend
+      if (localT <= blendEnd) {
+        const t = THREE.MathUtils.smootherstep(localT, blendStart, blendEnd);
+        curr?.setEffectiveWeight(1 - t);
+        next?.setEffectiveWeight(t);
+        next.time = next.getClip().duration * t;
+        return;
+      }
+
+      // After blend
+      next?.setEffectiveWeight(1);
+    };
+
+    scroll.on("update", handleUpdate);
+    return () => scroll.off("update", handleUpdate);
+  }, [scroll, actions]);
+
+  // 🌀 your existing mouse rotation
   useFrame((_, delta) => {
     if (!groupRef.current) return;
 
-    // 🧠 smooth values (store outside if not already)
     rotationRef.current.x = THREE.MathUtils.damp(
       rotationRef.current.x,
       props.mouse.current.x,
@@ -153,19 +266,15 @@ export function Hand1(props: HandProps) {
       delta,
     );
 
-    // 🎯 apply rotation (base + mouse)
-    groupRef.current.rotation.y =
-      baseRotation.y + rotationRef.current.x * maxRotation;
-
-    // groupRef.current.rotation.x =
-    //   baseRotation.x + rotationRef.current.y * maxRotation * 0.5;
+    groupRef.current.rotation.x =
+      baseRotation.x + rotationRef.current.x * maxRotation;
   });
 
   return (
-    <group ref={groupRef} {...props}>
-      <Center>
+    <group position={[-0.3, 0, 0]}>
+      <group ref={groupRef} scale={1.2} {...props}>
         <primitive object={scene} />
-      </Center>
+      </group>
     </group>
   );
 }
@@ -176,9 +285,9 @@ export function Hand2(props: HandProps) {
   const groupRef = useRef<THREE.Group>(null!);
   const rotationRef = useRef({ x: 0, y: 0 });
 
-  const baseRotation = new THREE.Euler(Math.PI, 0,-Math.PI / 2);
+  const baseRotation = new THREE.Euler(Math.PI, 0, -Math.PI / 2);
 
-  const { maxRotation } = useMaterial(scene,props.color);
+  const { maxRotation } = useMaterial(scene, props.color);
 
   const { actions } = useAnimations(animations, groupRef);
 
@@ -228,6 +337,49 @@ export function Hand2(props: HandProps) {
   //   };
   // }, [actions, animation]);
 
+  useEffect(() => {
+    const action = actions["GrabHold"];
+    if (action) {
+      action.play();
+      // action.paused = true; // 👈 important for scroll control
+    }
+  }, [actions]);
+
+  const scroll = useScroll();
+
+  useEffect(() => {
+    const handleUpdate = (data: {
+      progress: number;
+      current: number;
+      target: number;
+    }) => {
+      const p = data.progress;
+
+      return;
+
+      // 🎯 remap 0.3 → 0 and 0.7 → 1
+      const t = THREE.MathUtils.clamp((p - 0.3) / 0.4, 0, 1);
+
+      // 🕹️ play animation based on t
+      const action = actions["GrabHold"]; // change to your animation
+
+      if (action) {
+        action.paused = false;
+        action.enabled = true;
+        // action.timeScale = t;
+
+        // console.log(t)
+
+        // ⏱️ scrub animation
+        // action.time = action.getClip().duration * t;
+      }
+    };
+
+    scroll.on("update", handleUpdate);
+    return () => {
+      scroll.off("update", handleUpdate);
+    };
+  }, [scroll, actions]);
   useFrame((_, delta) => {
     if (!groupRef.current) return;
 
@@ -256,11 +408,11 @@ export function Hand2(props: HandProps) {
 
   return (
     <group
-      rotation={baseRotation}
-      position={[-.8, 0, 0]}
       scale={2.2}
-      ref={groupRef}
       {...props}
+      rotation={baseRotation}
+      position={[-0.8, 0, 0]}
+      ref={groupRef}
     >
       <primitive object={scene} />
     </group>
@@ -268,7 +420,7 @@ export function Hand2(props: HandProps) {
 }
 
 useGLTF.preload([
-  "/models/arm1.glb",
+  "/models/arm.glb",
   "/models/arm2.glb",
   "/models/actionhand.glb",
   "/models/The Hand 3D Model.glb",

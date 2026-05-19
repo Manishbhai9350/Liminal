@@ -80,9 +80,9 @@ const App = () => {
       <LoaderProvider>
         <ScrollProvider
           paused={true}
-          snapConfig={snapConfig}
-          snapIdleMs={2000}
-          max={innerHeight * 10}
+          // snapConfig={snapConfig}
+          // snapIdleMs={2000}
+          max={innerHeight * 13}
         >
           <Loader
             entered={Entered}

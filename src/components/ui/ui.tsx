@@ -17,7 +17,6 @@ const UI = () => {
   const Loader = useLoader();
 
   useEffect(() => {
-    console.log(LoadedA,LoadedB,Loader.revealed)
     if (LoadedA && LoadedB && Loader.revealed) {
       scroller.resume();
     }
