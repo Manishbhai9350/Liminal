@@ -5,6 +5,8 @@ import { useScroll } from "../scroll/useScroll";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useLoader } from "../../hooks/useLoader";
+import AudioWave from "../audio/audio.wave";
+import Ambient from "../audio/ambient";
 
 const UI = () => {
   const cursorRef = useRef<HTMLDivElement | null>(null);
@@ -79,6 +81,8 @@ const UI = () => {
 
   return (
     <div className="ui">
+      <Ambient />
+      <AudioWave />
       <div ref={cursorRef} className="cursor"></div>
       <Content
         loaded={LoadedA}

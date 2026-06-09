@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { LoaderContext } from "../context/loader.context";
+import { LoaderContext } from "../context/loader/loader.context";
 
 // ── hook ──────────────────────────────────────────────────────────────────
 export const useLoader = () => {

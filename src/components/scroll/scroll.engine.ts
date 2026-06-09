@@ -164,8 +164,19 @@ export class ScrollEngine {
 
   private lastY = 0;
 
+  private isTouchOnInteractive(e: TouchEvent): boolean {
+    const el = document.elementFromPoint(
+      e.touches[0].clientX,
+      e.touches[0].clientY,
+    ) as HTMLElement | null;
+    return !!el?.closest(
+      "button, a, input, select, textarea, [data-interactive], svg, path",
+    );
+  }
+
   private handleTouchStart = (e: TouchEvent) => {
     if (this.paused) return;
+    if (this.isTouchOnInteractive(e)) return;
     e.preventDefault();
     this.markInput();
     this.lastY = e.touches[0].clientY;
@@ -173,6 +184,7 @@ export class ScrollEngine {
 
   private handleTouchMove = (e: TouchEvent) => {
     if (this.paused) return;
+    if (this.isTouchOnInteractive(e)) return;
     e.preventDefault();
     this.markInput();
     const y = e.touches[0].clientY;

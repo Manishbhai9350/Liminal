@@ -128,6 +128,8 @@ main.app {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  user-select: none;
+  pointer-events: none;
 
   .content {
     opacity: 0;
@@ -193,7 +195,7 @@ main.app {
       justify-content: flex-start;
       align-items: flex-end;
       .sys {
-        font-size: 2rem;
+        font-size: 1.5rem;
         font-weight: 300;
         line-height: 100%;
       }
@@ -249,8 +251,24 @@ main.app {
  }
 }
 
+.sound-svg {
+  cursor:pointer;
+  width:40px;
+  height:40px;
+  position:absolute;
+  left:2rem;
+  top:2rem;
+  overflow:hidden;
+  z-index: 999999;
+  opacity: 0;
+  pointer-events: none;
+}
+
 
 @media (max-width: 900px) {
+  .sound-svg {
+    left:1.5rem 
+  }
   .cursor {
     display: none;
   }

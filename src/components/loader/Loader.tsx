@@ -5,16 +5,12 @@ import { useForwardProgress } from "../../hooks/useProgression";
 import { SplitIt } from "../../utils";
 import { useLoader } from "../../hooks/useLoader";
 
-interface LoaderProps {
-  entered: boolean;
-  onEnter: ({ withAudio }: { withAudio: boolean }) => void;
-}
 
-const Loader = ({ entered, onEnter }: LoaderProps) => {
+const Loader = () => {
   const [close, setClose] = useState(false);
   const [unmount, setUnmount] = useState(false);
 
-  const { setEntered, setWithAudio } = useLoader();
+  const { setEntered, setWithAudio, setAmbient } = useLoader();
 
   const { progress, status } = useForwardProgress();
   const loaded = status === "loaded";
@@ -163,8 +159,8 @@ const Loader = ({ entered, onEnter }: LoaderProps) => {
                 onClick={() => {
                   setEntered(true);
                   setWithAudio(true);
+                  setAmbient(true);
                   setClose(true);
-                  onEnter({ withAudio: true });
                 }}
                 ref={enterBtnRef}
                 className="loader__enter-btn"
@@ -176,7 +172,6 @@ const Loader = ({ entered, onEnter }: LoaderProps) => {
                   setEntered(true);
                   setWithAudio(false);
                   setClose(true);
-                  onEnter({ withAudio: false });
                 }}
                 ref={silentBtnRef}
                 className="loader__enter-silent"
