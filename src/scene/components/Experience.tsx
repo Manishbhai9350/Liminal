@@ -204,31 +204,31 @@ const SceneRenderer = ({
         <TempMesh />
       </group> */}
 
-      <group ref={sceneARef} visible={initVisibleA}>
+      {/* <group ref={sceneARef} visible={initVisibleA}> */}
         {/* <Text position={[0,-2,0]}>
           Scene A
         </Text> */}
         <SceneContent color="#0029ff" which="A" mouse={mouse} {...transformA} />
-      </group>
+      {/* </group> */}
 
       {/* SceneB lives in the scene graph but is invisible by default.
           FBOCapture toggles it on only during the FBO render pass. */}
-      <group ref={sceneBRef} visible={initVisibleB}>
+      {/* <group ref={sceneBRef} visible={initVisibleB}> */}
         {/* <Text position={[0,-2,0]}>
             Scene B
           </Text> */}
-        <SceneContent color="#ff0000" which="B" mouse={mouse} {...transformB} />
-      </group>
+        {/* <SceneContent color="#ff0000" which="B" mouse={mouse} {...transformB} />
+      </group> */}
 
       {/* FBOCapture only mounts here — useFBO/useFrame never run in A or B mode */}
-      {onFBO && (
+      {/* {onFBO && (
         <FBOCapture
           mode={mode}
           sceneARef={sceneARef}
           sceneBRef={sceneBRef}
           onFBO={onFBO}
         />
-      )}
+      )} */}
     </>
   );
 };
@@ -358,7 +358,7 @@ const Experience = ({ mode = "A" }: ExperienceProps) => {
         // }}
       >
         {/* For Taking Snapshot */}
-        <Snapshot />
+        {/* <Snapshot /> */}
         {/* <Stats /> */}
         {/* <CameraControls /> */}
         <SceneRenderer
@@ -386,9 +386,9 @@ const Experience = ({ mode = "A" }: ExperienceProps) => {
             <CircularTransition fbo={fbo} progress={0.5} />
           </EffectComposer>
         )} */}
-        <EffectComposer  >
+        {/* <EffectComposer  >
           <CircularTransition fbo={fbo} />
-        </EffectComposer>
+        </EffectComposer> */}
       </Canvas>
     </>
   );

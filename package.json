@@ -21,6 +21,7 @@
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "three": "^0.184.0",
+    "three-custom-shader-material": "^6.4.0",
     "three-stdlib": "^2.36.1",
     "tsl": "^1.0.30",
     "webgpu": "^0.4.0"

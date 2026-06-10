@@ -82,10 +82,10 @@ const App = () => {
           // snapIdleMs={2000}
           max={innerHeight * 13}
         >
-          <Loader/>
+          {/* <Loader/> */}
           <ScrollUpdate mode={Mode} setMode={setMode} />
           <main className="app">
-            <UI />
+            {/* <UI /> */}
             {/* <h1 className="creative-dev">Creative &nbsp; Developer</h1> */}
             {/* <button className="snapshot">Snapshot</button> */}
             <Experience mode={Mode} />
