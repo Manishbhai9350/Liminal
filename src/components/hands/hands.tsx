@@ -13,6 +13,7 @@ import CSM from "three-custom-shader-material/vanilla";
 
 import ArmVertex from "./shaders/arm/vertex.glsl";
 import ArmFragment from "./shaders/arm/fragment.glsl";
+import { useControls } from "leva";
 
 const lembda = 2.5;
 
@@ -42,6 +43,14 @@ export function Arm1(props: HandProps) {
 
   const baseRotation = new THREE.Euler(0, 0, 0);
   const scroll = useScroll();
+
+  useControls('Hand Material',{
+    uHologramMix:{
+      value:0,
+      min:0,
+      max:1
+    }
+  })
 
   useEffect(() => {
     const handleUpdate = (data: {
@@ -123,6 +132,35 @@ export function Arm1(props: HandProps) {
       </mesh>
     </group>
   );
+  // return (
+  //   <group ref={groupRef} position={[0, 12, 0]} {...props}>
+  //     <mesh name="Point_Std_Skin_Arm_0">
+  //       <sphereGeometry args={[5]}  />
+  //       <CustomShaderMaterial
+  //         ref={MatRef}
+  //         baseMaterial={THREE.MeshStandardMaterial}
+  //         metalness={0.6}
+  //         roughness={0}
+  //         color={props.color}
+  //         vertexShader={ArmVertex}
+  //         fragmentShader={ArmFragment}
+  //         transparent
+  //         side={2}
+  //         uniforms={{
+  //           uTime: new THREE.Uniform(0),
+  //           uCamera: new THREE.Uniform(
+  //             new THREE.Vector3().copy(camera.position),
+  //           ),
+  //         }}
+  //       />
+  //       {/* <meshStandardMaterial
+  //         metalness={0.6}
+  //         roughness={0}
+  //         color={props.color}
+  //       /> */}
+  //     </mesh>
+  //   </group>
+  // );
 }
 
 export function Arm2(props: HandProps) {

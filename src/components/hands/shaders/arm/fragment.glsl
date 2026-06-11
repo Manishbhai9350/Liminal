@@ -5,26 +5,38 @@ uniform vec3 uCamera;
 uniform float uTime;
 void main() {
 
-    float ySin = sin((vPosition.y * 1.3 - uTime) * 10.0 );
+    float stripes = mod(vPosition.y * 2.0 - uTime * 10.0, 1.0);
 
-    ySin = 1.0 -  smoothstep(.0,.50,abs(ySin));
+    stripes = pow(stripes, 3.0);
 
-    vec4 col = vec4(ySin, 0., 0., 1.);
+    vec4 col = vec4(stripes, 0., 0., 1.);
 
     col.a = col.r;
     col.rgb = vec3(135., 206., 235.) / 255.;
 
-    vec3 CameraToVertex = normalize(vPosition - uCamera);
-
-    float fresnel = dot(csm_FragNormal,CameraToVertex) * .5 + .5;
+    vec3 _normal = vNormal;
 
     if(!gl_FrontFacing) {
-        fresnel = 1.0 - fresnel;
+        _normal = -_normal;
     }
 
-    fresnel = pow(fresnel,1.5);
+    vec3 CameraToVertex = normalize(vPosition - uCamera);
 
-    csm_FragColor = col;
-    csm_FragColor = vec4(vec3(1.0,.6,.9) * col.r,fresnel);
-    // csm_DiffuseColor = col;
+    float fresnel = dot(_normal, CameraToVertex) + 1.0;
+    fresnel = pow(fresnel, 2.0);
+    float falloff = smoothstep(.96,.0,fresnel);
+
+
+    float holographic = stripes * 2.0 * fresnel;
+    holographic += fresnel * 1.8;
+    // holographic *= falloff;
+
+    csm_DiffuseColor.a = mix(holographic,1.0,step(vPosition.y,-20.0 + uTime * 5.0));
+    
+
+    // fresnel = pow(fresnel, 1.5);
+
+    // csm_FragColor = col;
+    // csm_FragColor = vec4(vec3(1.0, 0.0, 0.0), holographic);
+    // csm_DiffuseColor = vec4(vec3(col.rgb), stripes * fresnel);
 }
