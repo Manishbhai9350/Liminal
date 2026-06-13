@@ -49,11 +49,12 @@ vec4 sceneTransition(vec4 inputColor, vec2 uv, float progress) {
 
     // scene B — incoming with inner distortion
     float circleMask = Circle(centered, 0.075 * scaledProg, scaledProg - scaledMask);
-    float circleInnerDistortion = Circle(centered, 0.25 * scaledProg, scaledProg - scaledMask);
+    float circleInnerDistortion = Circle(centered, /* 0.25 */ .1 * scaledProg, scaledProg - scaledMask);
     vec2 uv2 = Mul(uv, 1.0 + (uInnerDistortion - circleInnerDistortion * uInnerDistortion));
     vec3 tDiffuse2 = uSwap < 0.5 ? texture2D(uMap, uv2).rgb : texture2D(inputBuffer, uv2).rgb;
 
     vec3 color = mix(tDiffuse1, tDiffuse2, circleMask);
+    // color = vec3(scaledProg * .5,0.0,0.0);
 
     // wave glow ring
     float waveColor = wave * uWaveGlow * (1.0 - Circle(centered, 0.1, scaledProg - 0.1));

@@ -1,15 +1,13 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useFBO, Stats } from "@react-three/drei";
+import { useFBO } from "@react-three/drei";
 import * as THREE from "three";
 import { Leva, useControls } from "leva";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import HandScene from "./scene";
 import SceneEnv from "../../components/env/environment";
 import { EffectComposer } from "@react-three/postprocessing";
 import { CircularTransition } from "../../components/postprocessing/effects/CircularTransition";
-import Snapshot from "../../components/snapshot";
-import { useScroll } from "../../components/scroll/useScroll";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -112,13 +110,13 @@ const FBOCapture = ({ sceneARef, sceneBRef, mode, onFBO }: FBOCaptureProps) => {
 
   const fbo = useFBO(fboSize.w, fboSize.h, { samples: 4 });
 
-  const isTransitioning = useMemo(
-    () => mode === "TransitionToB" || mode === "TransitionToA",
-    [mode],
-  );
+  // const isTransitioning = useMemo(
+  //   () => mode === "TransitionToB" || mode === "TransitionToA",
+  //   [mode],
+  // );
 
   useFrame(() => {
-    if(mode == 'A') return;
+    if (mode == "A") return;
     const groupA = sceneARef.current;
     const groupB = sceneBRef.current;
     if (!groupA || !groupB) return;
@@ -195,8 +193,8 @@ const SceneRenderer = ({
   const sceneARef = useRef<THREE.Group | null>(null);
   const sceneBRef = useRef<THREE.Group | null>(null);
 
-  const initVisibleA = useMemo(() => mode == "A", []);
-  const initVisibleB = useMemo(() => mode == "B", []);
+  const initVisibleA = useMemo(() => mode == "A", [mode]);
+  const initVisibleB = useMemo(() => mode == "B", [mode]);
 
   return (
     <>
@@ -204,31 +202,25 @@ const SceneRenderer = ({
         <TempMesh />
       </group> */}
 
-      {/* <group ref={sceneARef} visible={initVisibleA}> */}
-        {/* <Text position={[0,-2,0]}>
-          Scene A
-        </Text> */}
+      <group ref={sceneARef} visible={initVisibleA}>
         <SceneContent color="#0029ff" which="A" mouse={mouse} {...transformA} />
-      {/* </group> */}
+      </group>
 
       {/* SceneB lives in the scene graph but is invisible by default.
           FBOCapture toggles it on only during the FBO render pass. */}
-      {/* <group ref={sceneBRef} visible={initVisibleB}> */}
-        {/* <Text position={[0,-2,0]}>
-            Scene B
-          </Text> */}
-        {/* <SceneContent color="#ff0000" which="B" mouse={mouse} {...transformB} />
-      </group> */}
+      <group ref={sceneBRef} visible={initVisibleB}>
+        <SceneContent color="#ff0000" which="B" mouse={mouse} {...transformB} />
+      </group>
 
       {/* FBOCapture only mounts here — useFBO/useFrame never run in A or B mode */}
-      {/* {onFBO && (
+      {onFBO && (
         <FBOCapture
           mode={mode}
           sceneARef={sceneARef}
           sceneBRef={sceneBRef}
           onFBO={onFBO}
         />
-      )} */}
+      )}
     </>
   );
 };
@@ -336,10 +328,10 @@ const Experience = ({ mode = "A" }: ExperienceProps) => {
 
   const fbo = useRef<THREE.Texture | null>(null);
 
-  const isTransitioning = useMemo(
-    () => mode == "TransitionToA" || mode == "TransitionToB",
-    [mode],
-  );
+  // const isTransitioning = useMemo(
+  //   () => mode == "TransitionToA" || mode == "TransitionToB",
+  //   [mode],
+  // );
 
   return (
     <>
@@ -386,9 +378,9 @@ const Experience = ({ mode = "A" }: ExperienceProps) => {
             <CircularTransition fbo={fbo} progress={0.5} />
           </EffectComposer>
         )} */}
-        {/* <EffectComposer  >
+        <EffectComposer>
           <CircularTransition fbo={fbo} />
-        </EffectComposer> */}
+        </EffectComposer>
       </Canvas>
     </>
   );
