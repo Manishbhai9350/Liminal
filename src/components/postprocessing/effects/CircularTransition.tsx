@@ -6,8 +6,9 @@ import {
   useEffect,
   type Ref,
   type RefObject,
+  useRef,
 } from "react";
-import { useThree } from "@react-three/fiber";
+import { useThree, useFrame } from "@react-three/fiber";
 import { useScroll } from "../../scroll/useScroll";
 import { InBounds } from "../../../utils";
 import { SCENE_BOUNDS } from "../../../config/scene.config";
@@ -16,13 +17,9 @@ import { useLoader } from "../../../hooks/useLoader";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
-// ─── Shader ───────────────────────────────────────────────────────────────────
-
 const CircularTransitionShader = {
   fragmentShader: circularTransitionShader,
 };
-
-// ─── Effect Class ─────────────────────────────────────────────────────────────
 
 export class CircularTransitionEffect extends Effect {
   private fboRef: RefObject<THREE.Texture | null>;
@@ -67,18 +64,13 @@ export class CircularTransitionEffect extends Effect {
     }
     this.time += deltaTime;
     this.uniforms.get("uTime")!.value = this.time;
-    // this.uniforms.get("uProgress")!.value = Math.abs(Math.sin(this.time * 0.4));
   }
 }
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 export type CircularTransitionProps = {
   progress?: number;
   fbo: RefObject<THREE.Texture | null>;
 };
-
-// ─── React Component ──────────────────────────────────────────────────────────
 
 export const CircularTransition = forwardRef<
   CircularTransitionEffect,
@@ -96,15 +88,9 @@ export const CircularTransition = forwardRef<
         resolution: new THREE.Vector2(size.width, size.height),
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [], // create once — uniforms updated imperatively below
+    [],
   );
 
-  // Sync progress
-  useEffect(() => {
-    effect.uniforms.get("uProgress")!.value = 1;
-  }, [progress, effect]);
-
-  // Sync resolution on resize
   useEffect(() => {
     effect.uniforms.get("uResolution")!.value.set(size.width, size.height);
   }, [size, effect]);
@@ -114,7 +100,6 @@ export const CircularTransition = forwardRef<
   useGSAP(() => {
     if (!loader.entered) return;
 
-    // proxy object so GSAP has a plain value to tween
     const proxy = { value: 0 };
 
     const tween = gsap.to(proxy, {
@@ -126,14 +111,11 @@ export const CircularTransition = forwardRef<
       },
       onComplete() {
         effect.uniforms.get("uLoaded")!.value = 1;
-        loader.setRevealed(true)
+        loader.setRevealed(true);
       },
     });
 
-    // kill the tween if the component unmounts mid-animation
-    return () => {
-      tween.kill();
-    };
+    return () => tween.kill();
   }, [loader.entered, effect]);
 
   const scroll = useScroll();
@@ -146,10 +128,10 @@ export const CircularTransition = forwardRef<
 
       if (InBounds(prog, [0.1, 0.3])) {
         uProgress = THREE.MathUtils.mapLinear(prog, 0.1, 0.3, 0, 1);
-        uSwap = 0; // A → B: inputColor=A, uMap=B
+        uSwap = 0;
       } else if (InBounds(prog, [0.7, 0.9])) {
         uProgress = THREE.MathUtils.mapLinear(prog, 0.7, 0.9, 0, 1);
-        uSwap = 1; // B → A: swap them
+        uSwap = 1;
       } else if (InBounds(prog, SCENE_BOUNDS.A)) {
         uProgress = 0;
       } else if (InBounds(prog, SCENE_BOUNDS.B)) {
@@ -162,5 +144,6 @@ export const CircularTransition = forwardRef<
     scroll.on("update", update);
     return () => scroll.off("update", update);
   }, []);
+
   return <primitive ref={ref} object={effect} dispose={null} />;
 });

@@ -4,72 +4,64 @@ import { SplitText } from "gsap/SplitText";
 import { ScrollProvider } from "./components/scroll/scroll.provider";
 import Experience, { type SceneMode } from "./scene/components/Experience";
 import { useRoute } from "./utils/route";
-// import { SCENE_CONFIG } from "./config/scene.config";
-// import type { SnapZone } from "./components/scroll/scroll.engine";
-// import { useControls } from "leva";
 import { useState } from "react";
 import { ScrollUpdate } from "./components/scroll.update";
 import Loader from "./components/loader/Loader";
 import { LoaderProvider } from "./context/loader/provider";
+import type { SnapZone } from "./components/scroll/scroll.engine";
+import { SCENE_CONFIG } from "./config/scene.config";
 
 gsap.registerPlugin(SplitText);
 const App = () => {
   const path = useRoute();
 
-  // const snapConfig: SnapZone[] = [
-  //   // All The Text Area Snapping
-  //   {
-  //     start: SCENE_CONFIG.sceneA_fadeOut.startProg,
-  //     end: SCENE_CONFIG.sceneA_fadeOut.endProg,
-  //     pin: "start",
-  //     snapIdleMs: 1000,
-  //     lerp: 0.03, // slower snap animation
-  //     lerpFn: (cur, tgt, f) => cur + (tgt - cur) * f, // plain linear lerp
-  //   },
-  //   {
-  //     start: SCENE_CONFIG.sceneA_fadeIn.startProg,
-  //     end: SCENE_CONFIG.sceneA_fadeIn.endProg,
-  //     pin: "end",
-  //     snapIdleMs: 1000,
-  //     lerp: 0.03, // slower snap animation
-  //     lerpFn: (cur, tgt, f) => cur + (tgt - cur) * f, // plain linear lerp
-  //   },
-  //   {
-  //     start: SCENE_CONFIG.sceneB_fadeOut.startProg,
-  //     end: SCENE_CONFIG.sceneB_fadeOut.endProg,
-  //     pin: "start",
-  //     snapIdleMs: 100,
-  //     lerp: 0.03, // slower snap animation
-  //     lerpFn: (cur, tgt, f) => cur + (tgt - cur) * f, // plain linear lerp
-  //   },
-  //   {
-  //     start: SCENE_CONFIG.sceneB_fadeIn.startProg,
-  //     end: SCENE_CONFIG.sceneB_fadeIn.endProg,
-  //     pin: "end",
-  //     snapIdleMs: 100,
-  //     lerp: 0.03, // slower snap animation
-  //     lerpFn: (cur, tgt, f) => cur + (tgt - cur) * f, // plain linear lerp
-  //   },
-  //   {
-  //     start: SCENE_CONFIG.transitionAtoB.startProg,
-  //     end: SCENE_CONFIG.transitionAtoB.endProg,
-  //     lerp: 0.05,
-  //     snapIdleMs: 1500,
-  //   },
-  //   {
-  //     start: SCENE_CONFIG.transitionBtoA.startProg,
-  //     end: SCENE_CONFIG.transitionBtoA.endProg,
-  //     lerp: 0.05,
-  //     snapIdleMs: 1500,
-  //   },
-  // ];
-
-  // const { mode } = useControls({
-  //   mode: {
-  //     value: "A",
-  //     options: ["A", "B", "TransitionToA", "TransitionToB"],
-  //   },
-  // });
+  const snapConfig: SnapZone[] = [
+    // All The Text Area Snapping
+    {
+      start: SCENE_CONFIG.sceneA_fadeOut.startProg,
+      end: SCENE_CONFIG.sceneA_fadeOut.endProg,
+      pin: "start",
+      snapIdleMs: 1000,
+      lerp: 0.03, // slower snap animation
+      lerpFn: (cur, tgt, f) => cur + (tgt - cur) * f, // plain linear lerp
+    },
+    {
+      start: SCENE_CONFIG.sceneA_fadeIn.startProg,
+      end: SCENE_CONFIG.sceneA_fadeIn.endProg,
+      pin: "end",
+      snapIdleMs: 1000,
+      lerp: 0.03, // slower snap animation
+      lerpFn: (cur, tgt, f) => cur + (tgt - cur) * f, // plain linear lerp
+    },
+    {
+      start: SCENE_CONFIG.sceneB_fadeOut.startProg,
+      end: SCENE_CONFIG.sceneB_fadeOut.endProg,
+      pin: "start",
+      snapIdleMs: 100,
+      lerp: 0.03, // slower snap animation
+      lerpFn: (cur, tgt, f) => cur + (tgt - cur) * f, // plain linear lerp
+    },
+    {
+      start: SCENE_CONFIG.sceneB_fadeIn.startProg,
+      end: SCENE_CONFIG.sceneB_fadeIn.endProg,
+      pin: "end",
+      snapIdleMs: 100,
+      lerp: 0.03, // slower snap animation
+      lerpFn: (cur, tgt, f) => cur + (tgt - cur) * f, // plain linear lerp
+    },
+    {
+      start: SCENE_CONFIG.transitionAtoB.startProg,
+      end: SCENE_CONFIG.transitionAtoB.endProg,
+      lerp: 0.05,
+      snapIdleMs: 1500,
+    },
+    {
+      start: SCENE_CONFIG.transitionBtoA.startProg,
+      end: SCENE_CONFIG.transitionBtoA.endProg,
+      lerp: 0.05,
+      snapIdleMs: 1500,
+    },
+  ];
 
   const [Mode, setMode] = useState<SceneMode>("A");
 
@@ -78,8 +70,8 @@ const App = () => {
       <LoaderProvider>
         <ScrollProvider
           paused={true}
-          // snapConfig={snapConfig}
-          // snapIdleMs={2000}
+          snapConfig={snapConfig}
+          snapIdleMs={2000}
           max={innerHeight * 13}
         >
           <Loader />

@@ -39,6 +39,11 @@ export function Arm1(props: HandProps) {
   const camera = useThree((v) => v.camera);
   const sceneBounds = useThree((v) => v.viewport);
 
+      //   color: "#0000ff",
+      // colorA: "#000000",
+      // colorB: "#2800c7",
+      // colorC: "#00b5f2",
+
   const Uniforms = useMemo(
     () => ({
       uTime: new THREE.Uniform(0),
@@ -47,6 +52,12 @@ export function Arm1(props: HandProps) {
       uTop: new THREE.Uniform(0),
       uAnimated: new THREE.Uniform(0),
       uProgress: new THREE.Uniform(0),
+      uDissolveProgress: { value: 1 }, // animate 0 → 1 to reveal, 1 → 0 to dissolve
+      uDissolveEdgeWidth: { value: 0.03 },
+      // uDissolveEdgeColor: { value: new THREE.Color("#00ffff") },
+      uDissolveEdgeColor: { value: new THREE.Color("#00b5f2") },
+      // uDissolveEdgeColor: { value: new THREE.Color("#000000") },
+      uDissolveFrequency: { value: 1.0/1.5 },
     }),
     [camera.position],
   );
@@ -161,6 +172,12 @@ export function Arm1(props: HandProps) {
         }
       },
     });
+
+    gsap.to(MatRef.current.uniforms.uDissolveProgress, {
+      delay:.7,
+      value: -.3,
+      duration: 2.5,
+    });
     return () => {};
   }, [revealed, sceneBounds.height, Uniforms, nodes.Point_Std_Skin_Arm_0]);
 
@@ -179,7 +196,7 @@ export function Arm1(props: HandProps) {
           vertexShader={ArmVertex}
           fragmentShader={ArmFragment}
           transparent
-          side={2}
+          // side={2}
           uniforms={Uniforms}
         />
         {/* <meshStandardMaterial

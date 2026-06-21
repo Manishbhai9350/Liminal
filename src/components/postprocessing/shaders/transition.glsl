@@ -33,8 +33,6 @@ vec4 sceneTransition(vec4 inputColor, vec2 uv, float progress) {
     float time = uTime * 2.5;
     vec2 centered = (uv - 0.5) * vec2(aspect, 1.0);
 
-    // Scale progress so the circle always reaches every corner
-    // regardless of aspect ratio. Corner is at (aspect/2, 0.5).
     float maxDist = length(vec2(aspect, 1.0) * 0.5);
     float scaledProg = progress * maxDist * 1.2;
     float scaledMask = uMaskRadius * maxDist;
@@ -43,24 +41,19 @@ vec4 sceneTransition(vec4 inputColor, vec2 uv, float progress) {
     float wave = circleWave * smoothstep(0.0, 2.0, abs(sin(time + circleWave * PI * 3.0)));
     float height = 0.7;
 
-    // scene A — distorted resample
     vec2 uv1 = Mul(uv, 1.0 - (circleWave + wave) * height);
     vec3 tDiffuse1 = uSwap < 0.5 ? texture2D(inputBuffer, uv1).rgb : texture2D(uMap, uv1).rgb;
 
-    // scene B — incoming with inner distortion
     float circleMask = Circle(centered, 0.075 * scaledProg, scaledProg - scaledMask);
-    float circleInnerDistortion = Circle(centered, /* 0.25 */ .1 * scaledProg, scaledProg - scaledMask);
+    float circleInnerDistortion = Circle(centered, .1 * scaledProg, scaledProg - scaledMask);
     vec2 uv2 = Mul(uv, 1.0 + (uInnerDistortion - circleInnerDistortion * uInnerDistortion));
     vec3 tDiffuse2 = uSwap < 0.5 ? texture2D(uMap, uv2).rgb : texture2D(inputBuffer, uv2).rgb;
 
     vec3 color = mix(tDiffuse1, tDiffuse2, circleMask);
-    // color = vec3(scaledProg * .5,0.0,0.0);
 
-    // wave glow ring
     float waveColor = wave * uWaveGlow * (1.0 - Circle(centered, 0.1, scaledProg - 0.1));
     color += waveColor;
 
-    // edge shadow
     color *= 1.0 - 0.7 * clamp(0.0, 1.0, circleMask - Circle(centered + vec2(-0.1, 0.1) * scaledProg, 0.175 * scaledProg, scaledProg - scaledMask));
 
     return vec4(color, inputColor.a);
@@ -76,20 +69,15 @@ vec4 loaderTransition(vec4 inputColor, vec2 uv, float loadProg) {
     float time = uTime * 2.5;
     vec2 centered = (uv - 0.5) * vec2(aspect, 1.0);
 
-    // Same maxDist fix so loader circle covers the whole screen
     float maxDist = length(vec2(aspect, 1.0) * 0.5);
     float scaledProg = progress * maxDist;
     float scaledMask = uMaskRadius * maxDist;
 
     float circleWave = Circle(centered, 0.3, scaledProg);
     float wave = circleWave * smoothstep(0.0, 2.0, abs(sin(time + circleWave * PI * 3.0)));
-    float height = 0.7;
 
-    // SWAPPED vs original:
-    // scene A side — uLoaderColor is the base (outgoing)
     vec3 tDiffuse1 = uLoaderColor;
 
-    // scene B side — inputColor (the scene) is incoming
     float circleMask = Circle(centered, 0.075 * scaledProg, scaledProg - scaledMask);
     float circleInnerDistortion = Circle(centered, 0.25 * scaledProg, scaledProg - scaledMask);
     vec2 uv2 = Mul(uv, 1.0 + (uInnerDistortion - circleInnerDistortion * uInnerDistortion));
@@ -97,11 +85,9 @@ vec4 loaderTransition(vec4 inputColor, vec2 uv, float loadProg) {
 
     vec3 color = mix(tDiffuse1, tDiffuse2, circleMask);
 
-    // wave glow ring
     float waveColor = wave * uWaveGlow * (1.0 - Circle(centered, 0.1, scaledProg - 0.1));
     color += waveColor;
 
-    // edge shadow
     color *= 1.0 - 0.7 * clamp(0.0, 1.0, circleMask - Circle(centered + vec2(-0.1, 0.1) * scaledProg, 0.175 * scaledProg, scaledProg - scaledMask));
 
     return vec4(color, inputColor.a);
@@ -115,6 +101,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
     }
 
     float progress = cubicIn(uProgress * 1.41) / 1.41;
+
     if(progress <= 0.0) {
         outputColor = inputColor;
         return;
