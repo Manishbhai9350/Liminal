@@ -11,7 +11,7 @@ import { CircularTransition } from "../../components/postprocessing/effects/Circ
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type SceneMode = "A" | "B" | "TransitionToB" | "TransitionToA";
+type SceneMode = "A" | "B" | "TransitionToB" | "TransitionToA";
 
 type SceneColors = {
   color: string;

@@ -1,5 +1,4 @@
-import { SplitText } from "gsap/SplitText";
-import gsap from "gsap";
+import { SplitText } from "gsap/all";
 
 const DefualtVars: SplitText.Vars = {
   type: "words, lines",

@@ -1,8 +1,8 @@
 import gsap from "gsap";
+import { lazy, Suspense } from "react";
 import UI from "./components/ui/ui";
-import { SplitText } from "gsap/SplitText";
+import { SplitText } from "gsap/all";
 import { ScrollProvider } from "./components/scroll/scroll.provider";
-import Experience, { type SceneMode } from "./scene/components/Experience";
 import { useRoute } from "./utils/route";
 import { useState } from "react";
 import { ScrollUpdate } from "./components/scroll.update";
@@ -10,6 +10,9 @@ import Loader from "./components/loader/Loader";
 import { LoaderProvider } from "./context/loader/provider";
 import type { SnapZone } from "./components/scroll/scroll.engine";
 import { SCENE_CONFIG } from "./config/scene.config";
+const Experience = lazy(() => import("./scene/components/Experience"));
+
+export type SceneMode = "A" | "B" | "TransitionToB" | "TransitionToA";
 
 gsap.registerPlugin(SplitText);
 const App = () => {
@@ -80,7 +83,9 @@ const App = () => {
             <UI />
             {/* <h1 className="creative-dev">Creative &nbsp; Developer</h1> */}
             {/* <button className="snapshot">Snapshot</button> */}
-            <Experience mode={Mode} />
+            <Suspense fallback={null}>
+              <Experience mode={Mode} />
+            </Suspense>
           </main>
         </ScrollProvider>
       </LoaderProvider>
