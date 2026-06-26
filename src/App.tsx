@@ -40,7 +40,7 @@ const App = () => {
       start: SCENE_CONFIG.sceneB_fadeOut.startProg,
       end: SCENE_CONFIG.sceneB_fadeOut.endProg,
       pin: "start",
-      snapIdleMs: 100,
+      snapIdleMs: 1000,
       lerp: 0.03, // slower snap animation
       lerpFn: (cur, tgt, f) => cur + (tgt - cur) * f, // plain linear lerp
     },
@@ -48,7 +48,7 @@ const App = () => {
       start: SCENE_CONFIG.sceneB_fadeIn.startProg,
       end: SCENE_CONFIG.sceneB_fadeIn.endProg,
       pin: "end",
-      snapIdleMs: 100,
+      snapIdleMs: 1000,
       lerp: 0.03, // slower snap animation
       lerpFn: (cur, tgt, f) => cur + (tgt - cur) * f, // plain linear lerp
     },
